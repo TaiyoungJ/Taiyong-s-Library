@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📖 도서 신청 시스템</title>
+    <title>📖 상계고 도서 신청</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,209 +11,56 @@
 
     <style>
         /* ==========================================
-           🎨 기존 교무실 대시보드 디자인 시스템 계승
+           🎨 디자인 시스템
            ========================================== */
-        body { 
-            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; 
-            font-weight: 400; 
-            background-color: #e9ecef; 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            font-weight: 400;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
             transition: background 0.3s, color 0.3s;
         }
-        input, select, button, textarea { font-family: inherit; box-sizing: border-box; } 
+        input, select, button, textarea { font-family: inherit; box-sizing: border-box; }
 
-        .header-area h1, .section-title, .add-btn, .toggle-dark-btn, .book-title {
+        .header-area h1, .section-title, .add-btn, .book-title {
             font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
             font-weight: 700;
         }
 
         .app-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 16px; }
 
-        /* === 헤더 구역 === */
-        .header-area { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background-color: #2c3e50; 
-            color: white; 
-            padding: 18px 24px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .header-area h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
-        
+        /* === 상단 다크모드 토글 바 === */
+        .top-bar { display: flex; justify-content: flex-end; }
         .toggle-dark-btn {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 8px 14px;
-            border-radius: 6px;
+            background: white;
+            border: 1px solid #dee2e6;
+            color: #555;
+            padding: 7px 18px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 700;
+            font-family: inherit;
             transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
         }
-        .toggle-dark-btn:hover { background-color: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
+        .toggle-dark-btn:hover { background: #f4f6f8; transform: translateY(-1px); }
 
-        /* === 현재 차수 안내 바 === */
-        .term-badge-bar {
-            background-color: #fff3cd;
-            border-left: 5px solid #ffc107;
-            color: #856404;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 15px;
+        /* === 헤더 구역 === */
+        .header-area {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: linear-gradient(135deg, #1a3355 0%, #2c4f7c 100%);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(26,51,85,0.28);
         }
-
-        /* === 섹션 공통 스타일 === */
-        .section { 
-            background-color: white; 
-            padding: 24px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .section-title { font-size: 18px; color: #34495e; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
-
-        /* === 도서 검색 UI === */
-        .search-row { display: flex; gap: 8px; margin-bottom: 16px; }
-        .search-input { 
-            flex: 1; 
-            padding: 12px; 
-            border: 1px solid #bdc3c7; 
-            border-radius: 8px; 
-            font-size: 15px; 
-            background-color: #f8f9fa;
-        }
-        .search-input:focus { outline: none; border-color: #3498db; background-color: white; }
-        
-        .search-btn { 
-            background-color: #3498db; 
-            color: white; 
-            border: none; 
-            padding: 0 24px; 
-            border-radius: 8px; 
-            font-size: 15px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: background 0.2s;
-        }
-        .search-btn:hover { background-color: #2980b9; }
-
-        /* === 검색 결과 목록 === */
-        .search-results { 
-            max-height: 320px; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            padding-right: 4px;
-        }
-        .book-card {
-            display: flex;
-            gap: 14px;
-            background: #f8f9fa;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .book-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-color: #3498db; }
-        .book-card.selected { border-color: #27ae60; background-color: #f0fdf4; }
-        .book-thumb { width: 70px; height: 100px; object-fit: cover; background: #edf2f7; border-radius: 4px; flex-shrink: 0; }
-        .book-info { display: flex; flex-direction: column; justify-content: center; gap: 4px; font-size: 14px; color: #4a5568; }
-        .book-title { font-size: 16px; color: #1a202c; margin: 0; }
-        
-        /* === 알림 메시지 배지 === */
-        .validation-msg {
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 16px;
-            display: none;
-        }
-        .msg-error { background-color: #fdedec; color: #e74c3c; border-left: 5px solid #e74c3c; }
-        .msg-warn { background-color: #fff3e0; color: #e67e22; border-left: 5px solid #e67e22; }
-        .msg-success { background-color: #eafaf1; color: #2ecc71; border-left: 5px solid #2ecc71; }
-
-        /* === 신청서 폼 UI === */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
-        
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group.full-width { grid-column: 1 / -1; }
-        .form-group label { font-size: 14px; font-weight: bold; color: #4a5568; }
-        
-        .form-control { 
-            padding: 12px; 
-            border: 1px solid #bdc3c7; 
-            border-radius: 8px; 
-            font-size: 15px; 
-            background-color: #f8f9fa;
-        }
-        .form-control:focus { outline: none; border-color: #3498db; background-color: white; }
-        .form-control:disabled { background-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
-        textarea.form-control { resize: vertical; min-height: 100px; }
-
-        .submit-btn { 
-            width: 100%; 
-            background-color: #27ae60; 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: background 0.2s; 
-        }
-        .submit-btn:hover { background-color: #219a52; }
-        .submit-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
-
-        /* === 스크롤바 커스텀 === */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
-        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
-
-        /* ==========================================
-           🌓 다크모드 (기존 글래스모피즘 테마 매칭)
-           ========================================== */
-        body.dark-mode {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            background-attachment: fixed;
-            color: #cccccc;
-        }
-        body.dark-mode .section {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-        }
-        body.dark-mode .section-title { color: #ffffff; border-bottom-color: rgba(255,255,255,0.1); }
-        body.dark-mode .term-badge-bar { background: rgba(241,196,15,0.15); color: #f1c40f; border-left-color: #f1c40f; }
-        body.dark-mode .book-title { color: #ffffff; }
-        body.dark-mode .book-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); color: #cccccc; }
-        body.dark-mode .book-card:hover { border-color: #3498db; background: rgba(52,152,219,0.1); }
-        body.dark-mode .book-card.selected { border-color: #27ae60; background-color: rgba(39,174,96,0.15); }
-        body.dark-mode .form-group label { color: #aaaaaa; }
-        body.dark-mode .search-input, body.dark-mode .form-control {
-            background: rgba(0,0,0,0.3);
-            border-color: rgba(255,255,255,0.15);
-            color: #ffffff;
-        }
-        body.dark-mode .search-input:focus, body.dark-mode .form-control:focus { border-color: #3498db; background: rgba(52,152,219,0.05); }
-        body.dark-mode .form-control:disabled { background: rgba(255,255,255,0.02); color: #555; }
-        body.dark-mode ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-        body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+        .header-area h1 { margin: 0; font-size: 22px; letter-spacing: 0.5px; }
 
         /* === 뒤로가기 버튼 === */
         .back-btn {
@@ -228,7 +75,215 @@
         }
         .back-btn:hover { background-color: rgba(255,255,255,0.15); color: white; }
 
-        /* === 신청자 유형 토글 버튼 === */
+        /* === 현재 차수 안내 바 === */
+        .term-badge-bar {
+            background-color: #fff8e1;
+            border-left: 5px solid #ffc107;
+            color: #7d5a00;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* === 섹션 공통 스타일 === */
+        .section {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            border-left: 4px solid #e2e8f0;
+        }
+        .section-search { border-left-color: #3498db; }
+        .section-form   { border-left-color: #27ae60; }
+
+        /* === 스텝 제목 === */
+        .section-title {
+            font-size: 17px;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 18px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+        .step-1 { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .step-2 { background: linear-gradient(135deg, #27ae60, #219a52); }
+
+        /* === 도서 검색 UI === */
+        .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f8f9fa;
+        }
+        .search-input:focus { outline: none; border-color: #3498db; background-color: white; }
+
+        .search-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-btn:hover { background-color: #2980b9; }
+
+        /* === 인라인 에러 / 성공 메시지 === */
+        .inline-error {
+            background: #fdedec;
+            color: #c0392b;
+            border-left: 4px solid #e74c3c;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            animation: fadeIn 0.2s ease;
+        }
+        .inline-success {
+            background: #eafaf1;
+            color: #1e8449;
+            border-left: 4px solid #27ae60;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* === 검색 결과 목록 === */
+        .search-results {
+            max-height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 4px;
+        }
+        .book-card {
+            display: flex;
+            gap: 14px;
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .book-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.07); border-color: #3498db; }
+        .book-card.selected { border-color: #27ae60; background-color: #f0fdf4; }
+        .book-thumb { width: 70px; height: 100px; object-fit: cover; background: #edf2f7; border-radius: 4px; flex-shrink: 0; }
+        .book-thumb-empty {
+            width: 70px;
+            height: 100px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: linear-gradient(145deg, #edf2f7, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #a0aec0;
+        }
+        .book-info { display: flex; flex-direction: column; justify-content: center; gap: 4px; font-size: 14px; color: #4a5568; }
+        .book-title { font-size: 16px; color: #1a202c; margin: 0; }
+
+        /* === 선택된 책 미니 프리뷰 === */
+        .selected-preview {
+            display: none;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, #f0fdf4, #e8f8f0);
+            border: 1.5px solid #a9dfbf;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+        .preview-thumb {
+            width: 52px;
+            height: 74px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: #d5f5e3;
+        }
+        .preview-thumb-empty {
+            width: 52px;
+            height: 74px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: #d5f5e3;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .preview-body { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .preview-label { font-size: 11px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.5px; }
+        .preview-title { font-size: 15px; font-weight: 700; color: #1a202c; }
+        .preview-meta  { font-size: 13px; color: #718096; }
+
+        /* === 알림 메시지 배지 (복본 검증) === */
+        .validation-msg {
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .msg-error   { background-color: #fdedec; color: #e74c3c; border-left: 5px solid #e74c3c; }
+        .msg-warn    { background-color: #fff3e0; color: #e67e22; border-left: 5px solid #e67e22; }
+        .msg-success { background-color: #eafaf1; color: #27ae60; border-left: 5px solid #27ae60; }
+
+        /* === 신청서 폼 UI === */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { font-size: 14px; font-weight: bold; color: #4a5568; }
+
+        .form-control {
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f8f9fa;
+        }
+        .form-control:focus { outline: none; border-color: #3498db; background-color: white; }
+        .form-control:disabled { background-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* === 신청자 유형 토글 === */
         .type-toggle { display: flex; gap: 8px; }
         .type-btn {
             flex: 1;
@@ -243,8 +298,8 @@
             font-family: inherit;
             color: #4a5568;
         }
-        .type-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
-        .type-btn:hover:not(.active) { border-color: #2c3e50; background-color: #edf2f7; }
+        .type-btn.active { background-color: #1a3355; color: white; border-color: #1a3355; }
+        .type-btn:hover:not(.active) { border-color: #1a3355; background-color: #edf2f7; }
 
         /* === 학년 / 반 / 번호 숫자 입력 === */
         .student-info-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -265,12 +320,91 @@
         .extra-checkbox input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; flex-shrink: 0; accent-color: #3498db; }
         .checkbox-label { font-size: 14px; color: #2c5282; cursor: pointer; font-weight: 700; line-height: 1.4; }
 
-        /* 다크모드 추가 */
+        /* === 제출 버튼 힌트 === */
+        .submit-hint {
+            text-align: center;
+            font-size: 13px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        /* === 제출 버튼 === */
+        .submit-btn {
+            width: 100%;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .submit-btn:hover { background-color: #219a52; }
+        .submit-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        /* === 스크롤바 === */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+        /* ==========================================
+           🌓 다크모드
+           ========================================== */
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f1f35 0%, #1a2e4a 100%);
+            background-attachment: fixed;
+            color: #cccccc;
+        }
+        body.dark-mode .toggle-dark-btn {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.18);
+            color: #ccc;
+            box-shadow: none;
+        }
+        body.dark-mode .toggle-dark-btn:hover { background: rgba(255,255,255,0.14); }
+        body.dark-mode .header-area {
+            background: linear-gradient(135deg, #0a1628 0%, #162540 100%);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+        }
+        body.dark-mode .section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-left: 4px solid rgba(255,255,255,0.15);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        body.dark-mode .section-search { border-left-color: #5dade2 !important; }
+        body.dark-mode .section-form   { border-left-color: #2ecc71 !important; }
+        body.dark-mode .section-title { color: #ffffff; border-bottom-color: rgba(255,255,255,0.1); }
+        body.dark-mode .term-badge-bar { background: rgba(241,196,15,0.12); color: #f1c40f; border-left-color: #f1c40f; }
+        body.dark-mode .book-title { color: #ffffff; }
+        body.dark-mode .book-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); color: #cccccc; }
+        body.dark-mode .book-card:hover { border-color: #3498db; background: rgba(52,152,219,0.1); }
+        body.dark-mode .book-card.selected { border-color: #27ae60; background-color: rgba(39,174,96,0.15); }
+        body.dark-mode .selected-preview { background: rgba(39,174,96,0.1); border-color: rgba(39,174,96,0.3); }
+        body.dark-mode .preview-title { color: #ffffff; }
+        body.dark-mode .preview-meta  { color: #a0aec0; }
+        body.dark-mode .form-group label { color: #aaaaaa; }
+        body.dark-mode .search-input, body.dark-mode .form-control {
+            background: rgba(0,0,0,0.3);
+            border-color: rgba(255,255,255,0.15);
+            color: #ffffff;
+        }
+        body.dark-mode .search-input:focus, body.dark-mode .form-control:focus { border-color: #3498db; background: rgba(52,152,219,0.05); }
+        body.dark-mode .form-control:disabled { background: rgba(255,255,255,0.02); color: #555; }
         body.dark-mode .type-btn { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); color: #cccccc; }
-        body.dark-mode .type-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
+        body.dark-mode .type-btn.active { background-color: #1a3355; color: white; border-color: #1a3355; }
         body.dark-mode .num-label { color: #cccccc; }
         body.dark-mode .extra-checkbox { background: rgba(52,152,219,0.1); border-color: rgba(52,152,219,0.3); }
         body.dark-mode .checkbox-label { color: #90cdf4; }
+        body.dark-mode .submit-hint { color: #606e80; }
+        body.dark-mode .inline-error { background: rgba(231,76,60,0.15); color: #ff8070; }
+        body.dark-mode .inline-success { background: rgba(39,174,96,0.15); color: #68d391; }
+        body.dark-mode ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+        body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -279,13 +413,14 @@
 <body>
 
     <div class="app-container">
-        
+
+        <div class="top-bar">
+            <button class="toggle-dark-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 다크모드</button>
+        </div>
+
         <div class="header-area">
             <h1>📚 도서 신청하기</h1>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <a href="index.html" class="back-btn">← 처음으로</a>
-                <button class="toggle-dark-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 다크모드</button>
-            </div>
+            <a href="index.html" class="back-btn">← 처음으로</a>
         </div>
 
         <div class="term-badge-bar">
@@ -293,19 +428,40 @@
             <span style="font-size: 13px; font-weight: normal;">(1인당 최대 5권 신청 가능)</span>
         </div>
 
-        <div class="section">
-            <div class="section-title">🔍 1단계: 신청할 도서 검색하기</div>
+        <!-- 1단계: 도서 검색 -->
+        <div class="section section-search">
+            <div class="section-title">
+                <span class="step-num step-1">1</span>
+                신청할 도서 검색하기
+            </div>
             <div class="search-row">
                 <input type="text" id="bookSearchInput" class="search-input" placeholder="책 제목, 저자 또는 ISBN을 입력하세요..." onkeydown="if(event.key==='Enter') searchBooks()">
                 <button class="search-btn" onclick="searchBooks()">검색</button>
             </div>
+            <div id="searchError" class="inline-error" style="display:none;"></div>
             <div class="search-results" id="searchResultsContainer">
                 <div style="text-align: center; color: #7f8c8d; padding: 20px;">검색 결과가 여기에 표시됩니다. 📚</div>
             </div>
         </div>
 
-        <div class="section">
-            <div class="section-title">📝 2단계: 신청자 정보 및 사유 입력</div>
+        <!-- 2단계: 신청자 정보 -->
+        <div class="section section-form">
+            <div class="section-title">
+                <span class="step-num step-2">2</span>
+                신청자 정보 및 사유 입력
+            </div>
+
+            <!-- 선택된 책 프리뷰 -->
+            <div id="selectedBookPreview" class="selected-preview">
+                <img id="previewThumb" class="preview-thumb" src="" alt="표지"
+                     onerror="this.style.display='none'; document.getElementById('previewThumbEmpty').style.display='flex'">
+                <div id="previewThumbEmpty" class="preview-thumb-empty">📚</div>
+                <div class="preview-body">
+                    <div class="preview-label">✅ 선택된 도서</div>
+                    <div id="previewTitle" class="preview-title"></div>
+                    <div id="previewMeta"  class="preview-meta"></div>
+                </div>
+            </div>
 
             <div id="validationBadge" class="validation-msg"></div>
 
@@ -375,6 +531,9 @@
                 </div>
             </div>
 
+            <div id="formError"   class="inline-error"   style="display:none;"></div>
+            <div id="formSuccess" class="inline-success" style="display:none;"></div>
+            <div id="submitHint"  class="submit-hint">📖 도서를 먼저 선택해야 신청서를 제출할 수 있어요.</div>
             <button class="submit-btn" id="submitRequestBtn" onclick="submitBookRequest()" disabled>📚 도서 신청서 제출하기</button>
         </div>
 
@@ -382,7 +541,7 @@
 
     <script>
         // ============================================================
-        // 🗄️ Firebase 설정 (기존 교무실 대시보드 프로젝트 정보 연동)
+        // 🗄️ Firebase 설정
         // ============================================================
         const firebaseConfig = {
             apiKey: "AIzaSyCaQkm4VDvmLVmltgwLwN3uYP-ShC6Pb3o",
@@ -393,50 +552,61 @@
             appId: "1:898677514153:web:cff731e4ff2c408c156eb8",
             measurementId: "G-M1SQXZ2LZQ"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
         const fbDb = firebase.firestore();
 
-        // 🔑 카카오 REST API 키 설정 (선생님의 카카오 API Key를 여기에 입력하세요)
-        const KAKAO_REST_API_KEY = "e86ae02ab786ca4afc53b6ea11ed5376"; 
+        const KAKAO_REST_API_KEY = "e86ae02ab786ca4afc53b6ea11ed5376";
 
         let selectedBook = null;
         let selectedUserType = 'student';
-        let currentActiveTerm = "2026년 3차 도서신청"; // 기본값 (DB 로드 실패 시 적용)
-        let allInventoryCache = null; // 소장 목록 캐시 (페이지 로드 시 한 번만 불러옴)
+        let currentActiveTerm = "2026년 3차 도서신청";
+        let allInventoryCache = null;
 
-        // 로드 시 초기화
         window.addEventListener('DOMContentLoaded', async () => {
             initDarkMode();
             await loadLibrarySettings();
         });
 
-        // ======= ⚙️ 파이어베이스 연동 및 환경 정보 로드 =======
+        // ======= 🔔 인라인 메시지 헬퍼 =======
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
+        function showSuccess(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
+
+        // ======= ⚙️ 파이어베이스 환경 정보 로드 =======
         async function loadLibrarySettings() {
             try {
-                // 루트 컬렉션의 librarySettings/config 문서에서 현재 설정된 차수를 읽어옵니다.
                 const configDoc = await fbDb.collection('librarySettings').doc('config').get();
                 if (configDoc.exists && configDoc.data().currentTerm) {
                     currentActiveTerm = configDoc.data().currentTerm;
                 }
                 document.getElementById('currentTermText').textContent = currentActiveTerm;
 
-                // 소장 목록 전체를 여기서 딱 한 번만 불러와 캐시에 저장
-                // 이후 복본 검색은 Firebase를 다시 찌르지 않고 이 캐시에서 비교
                 const inventorySnap = await fbDb.collection('libraryInventory').get();
                 allInventoryCache = inventorySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
             } catch (e) {
                 console.error("차수 로드 실패, 기본값으로 작동합니다:", e);
                 document.getElementById('currentTermText').textContent = currentActiveTerm;
-                allInventoryCache = []; // 로드 실패 시 빈 배열로 초기화
+                allInventoryCache = [];
             }
         }
 
-        // ======= 🔍 카카오 책 검색 API 기능 =======
+        // ======= 🔍 카카오 책 검색 API =======
         async function searchBooks() {
             const query = document.getElementById('bookSearchInput').value.trim();
-            if (!query) { alert('검색어를 입력해 주세요!'); return; }
+            if (!query) { showError('searchError', '검색어를 입력해 주세요.'); return; }
 
             const container = document.getElementById('searchResultsContainer');
             container.innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 20px;">⏳ 책을 열심히 검색하고 있어요...</div>`;
@@ -460,13 +630,18 @@
 
                 container.innerHTML = data.documents.map((book, idx) => {
                     const isbn = book.isbn.split(' ')[1] || book.isbn.split(' ')[0] || '없음';
-                    const escapedTitle = book.title.replace(/'/g, "\\'");
+                    const escapedTitle  = book.title.replace(/'/g, "\\'");
                     const escapedAuthor = book.authors.join(', ').replace(/'/g, "\\'");
-                    const escapedPub = book.publisher.replace(/'/g, "\\'");
+                    const escapedPub    = book.publisher.replace(/'/g, "\\'");
+                    const escapedThumb  = (book.thumbnail || '').replace(/'/g, "\\'");
+
+                    const thumbHtml = book.thumbnail
+                        ? `<img src="${book.thumbnail}" class="book-thumb" alt="표지" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="book-thumb-empty" style="display:none">📚</div>`
+                        : `<div class="book-thumb-empty">📚</div>`;
 
                     return `
-                        <div class="book-card" id="bookCard_${idx}" onclick="selectBook(${idx}, '${escapedTitle}', '${escapedAuthor}', '${escapedPub}', '${isbn}', '${book.thumbnail}')">
-                            <img src="${book.thumbnail || 'https://via.placeholder.com/70x100?text=No+Image'}" class="book-thumb" alt="표지">
+                        <div class="book-card" id="bookCard_${idx}" onclick="selectBook(${idx}, '${escapedTitle}', '${escapedAuthor}', '${escapedPub}', '${isbn}', '${escapedThumb}')">
+                            ${thumbHtml}
                             <div class="book-info">
                                 <h4 class="book-title">${book.title}</h4>
                                 <div><strong>저자:</strong> ${book.authors.join(', ') || '미상'} | <strong>출판사:</strong> ${book.publisher}</div>
@@ -476,7 +651,6 @@
                     `;
                 }).join('');
 
-                // 책 정보를 담아두기 위한 전역 캐시 배열 처리
                 window.searchedBooksCache = data.documents;
 
             } catch (e) {
@@ -485,15 +659,29 @@
             }
         }
 
-        // ======= 📚 책 선택 및 스마트 복본(중복) 검증 시스템 =======
+        // ======= 📚 책 선택 및 복본 검증 =======
         async function selectBook(idx, title, author, publisher, isbn, thumbnail) {
-            // UI 카드 시각 효과 처리
             document.querySelectorAll('.book-card').forEach(card => card.classList.remove('selected'));
             document.getElementById(`bookCard_${idx}`).classList.add('selected');
 
             selectedBook = { title, author, publisher, isbn, thumbnail };
-            
-            // 복본 필터링 동작 시작
+
+            // 선택된 책 미니 프리뷰 업데이트
+            const previewThumb = document.getElementById('previewThumb');
+            const previewThumbEmpty = document.getElementById('previewThumbEmpty');
+            if (thumbnail) {
+                previewThumb.src = thumbnail;
+                previewThumb.style.display = 'block';
+                previewThumbEmpty.style.display = 'none';
+            } else {
+                previewThumb.style.display = 'none';
+                previewThumbEmpty.style.display = 'flex';
+            }
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewMeta').textContent = author + ' · ' + publisher;
+            document.getElementById('selectedBookPreview').style.display = 'flex';
+            document.getElementById('submitHint').style.display = 'none';
+
             await runDuplicationCheck(title, author, isbn);
         }
 
@@ -501,18 +689,17 @@
         async function runDuplicationCheck(title, author, isbn) {
             const badge = document.getElementById('validationBadge');
             const submitBtn = document.getElementById('submitRequestBtn');
-            
+
             badge.style.display = 'block';
-            badge.className = 'validation-msg'; // 클래스 초기화
+            badge.className = 'validation-msg';
             badge.innerHTML = "⏳ 학교 도서관 소장 목록과 중복 여부를 대조하는 중입니다...";
             submitBtn.disabled = true;
 
             try {
-                // [1단계] 가장 강력한 식별자인 ISBN 매칭 검사
                 if (isbn && isbn !== '없음') {
                     const cleanIsbn = isbn.replace(/-/g, '').trim();
                     const isbnCheck = await fbDb.collection('libraryInventory').doc(cleanIsbn).get();
-                    
+
                     if (isbnCheck.exists) {
                         const invData = isbnCheck.data();
                         badge.classList.add('msg-error');
@@ -521,28 +708,22 @@
                     }
                 }
 
-                // [2단계 & 3단계] 제목과 저자를 기반으로 정밀 매칭 및 유사도 검사
-                // Firebase를 다시 찌르지 않고 페이지 로드 시 불러온 캐시에서 비교
                 const inventoryData = allInventoryCache || [];
-                
+
                 let exactMatch = false;
                 let suspectMatch = null;
 
-                // 문장 부호, 공백을 제거하여 순수 뼈대 텍스트만 추출하는 헬퍼 함수
                 const cleanString = str => str.replace(/[^가-힣a-zA-Z0-9]/g, '').toLowerCase().trim();
 
-                // 저자 문자열을 정제된 저자 이름 배열로 변환하는 헬퍼 함수
-                // 예) "류츠신 지음;이현아 옮김" → ["류츠신", "이현아"]
                 const cleanAuthors = str => str.split(';')
                     .map(part => {
-                        part = part.replace(/\[공\]/g, '');           // [공] 제거
-                        part = part.replace(/[·][가-힣]+/g, '');      // ·사진, ·그림 등 복합 역할어 제거
-                        part = part.replace(/지음|옮김|글|그림|사진|편저|엮음|역|저|편/g, ''); // 역할어 제거
+                        part = part.replace(/\[공\]/g, '');
+                        part = part.replace(/[·][가-힣]+/g, '');
+                        part = part.replace(/지음|옮김|글|그림|사진|편저|엮음|역|저|편/g, '');
                         return cleanString(part);
                     })
                     .filter(s => s.length > 0);
 
-                // 두 저자 배열 사이에 공통 저자가 하나라도 있으면 true
                 const authorsOverlap = (a, b) => a.some(name => b.includes(name));
 
                 const targetTitleClean = cleanString(title);
@@ -553,13 +734,10 @@
                     const invAuthors = cleanAuthors(inv.author || '');
                     const authorsMatch = authorsOverlap(targetAuthors, invAuthors);
 
-                    // [2단계] 제목과 저자(공통 저자 1명 이상)가 일치하는 경우
                     if (invTitleClean === targetTitleClean && authorsMatch) {
                         exactMatch = true;
                         suspectMatch = inv;
-                    } 
-                    // [3단계] 저자가 겹치고, 제목이 포함관계인 경우 (시리즈·개정판 등)
-                    else if (!exactMatch && authorsMatch && (invTitleClean.includes(targetTitleClean) || targetTitleClean.includes(invTitleClean))) {
+                    } else if (!exactMatch && authorsMatch && (invTitleClean.includes(targetTitleClean) || targetTitleClean.includes(invTitleClean))) {
                         suspectMatch = inv;
                     }
                 });
@@ -577,7 +755,6 @@
                     return;
                 }
 
-                // 모든 바리케이드를 통과한 완전 신작 도서인 경우
                 badge.classList.add('msg-success');
                 badge.innerHTML = `✨ 신청 가능: 우리 학교 도서관에 없는 새로운 도서입니다! 신청서를 마저 채워 제출해 주세요.`;
                 submitBtn.disabled = false;
@@ -613,30 +790,34 @@
             return document.getElementById('teacherDept').value;
         }
 
+        // 에러 메시지를 반환 (없으면 null)
         function validateStudentInfo() {
             if (selectedUserType === 'student') {
                 const g = parseInt(document.getElementById('studentGrade').value);
                 const c = parseInt(document.getElementById('studentClass').value);
                 const n = parseInt(document.getElementById('studentNumber').value);
-                if (!g || g < 1 || g > 3)  { alert('학년은 1~3 사이로 입력해주세요.'); return false; }
-                if (!c || c < 1 || c > 9)  { alert('반은 1~9 사이로 입력해주세요.');   return false; }
-                if (!n || n < 1 || n > 40) { alert('번호는 1~40 사이로 입력해주세요.'); return false; }
+                if (!g || g < 1 || g > 3)  return '학년은 1~3 사이로 입력해주세요.';
+                if (!c || c < 1 || c > 9)  return '반은 1~9 사이로 입력해주세요.';
+                if (!n || n < 1 || n > 40) return '번호는 1~40 사이로 입력해주세요.';
             } else {
-                if (!document.getElementById('teacherDept').value) { alert('소속 부서를 선택해주세요.'); return false; }
+                if (!document.getElementById('teacherDept').value) return '소속 부서를 선택해주세요.';
             }
-            return true;
+            return null;
         }
 
-        // ======= 🚀 최종 도서 신청서 파이어스토어 적재 =======
+        // ======= 🚀 최종 도서 신청서 제출 =======
         async function submitBookRequest() {
-            if (!selectedBook) { alert('먼저 도서를 검색하고 선택해 주세요!'); return; }
+            if (!selectedBook) { showError('formError', '📚 도서를 먼저 검색하고 선택해 주세요.'); return; }
 
-            const sName = document.getElementById('studentName').value.trim();
+            const sName  = document.getElementById('studentName').value.trim();
             const reason = document.getElementById('requestReason').value.trim();
 
-            if (!sName) { alert('신청자 성명을 입력해 주세요.'); return; }
-            if (!validateStudentInfo()) return;
-            if (!reason) { alert('도서 구입의 타당한 이유 및 사유를 적어주세요.'); return; }
+            if (!sName) { showError('formError', '✏️ 신청자 성명을 입력해 주세요.'); return; }
+
+            const validErr = validateStudentInfo();
+            if (validErr) { showError('formError', validErr); return; }
+
+            if (!reason) { showError('formError', '📝 신청 사유를 입력해 주세요.'); return; }
 
             const sInfo = getStudentInfo();
             const extraRequest = selectedUserType === 'student'
@@ -648,7 +829,6 @@
             submitBtn.textContent = "⏳ 신청서를 금고에 저장하는 중...";
 
             try {
-                // 🛑 1인당 5권 신청 제한 걸러내기 내부 로직 동작
                 const requestQuery = await fbDb.collection('bookRequests')
                     .where('term', '==', currentActiveTerm)
                     .where('studentName', '==', sName)
@@ -656,13 +836,12 @@
                     .get();
 
                 if (requestQuery.size >= 5) {
-                    alert(`✋ 신청 불가!\n\n${sName}님은 현재 차수(${currentActiveTerm})에 이미 5권의 도서 신청을 완료하셨기 때문에 더 이상 신청하실 수 없습니다.`);
+                    showError('formError', `${sName}님은 이번 차수(${currentActiveTerm})에 이미 5권을 신청하셨습니다. 더 이상 신청하실 수 없습니다.`);
                     submitBtn.disabled = false;
                     submitBtn.textContent = "📚 도서 신청서 제출하기";
                     return;
                 }
 
-                // 규격 통과 완료 후 최종 파이어스토어 컬렉션에 적재
                 await fbDb.collection('bookRequests').add({
                     title: selectedBook.title,
                     author: selectedBook.author,
@@ -680,13 +859,15 @@
                     createdAt: Date.now()
                 });
 
-                alert(`🎉 도서 신청이 정상적으로 접수되었습니다!\n관리자 선생님의 승인 후 도서 구매가 확정됩니다.`);
-                
-                // 제출 완료 후 입력폼 셋 리셋
+                showSuccess('formSuccess', `🎉 도서 신청이 정상적으로 접수되었습니다! 관리자 선생님의 승인 후 구매가 확정됩니다.`);
+
+                // 폼 리셋
                 document.getElementById('requestReason').value = "";
                 document.getElementById('bookSearchInput').value = "";
                 document.getElementById('searchResultsContainer').innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">검색 결과가 여기에 표시됩니다. 📚</div>';
                 document.getElementById('validationBadge').style.display = 'none';
+                document.getElementById('selectedBookPreview').style.display = 'none';
+                document.getElementById('submitHint').style.display = 'block';
                 document.getElementById('studentName').value = '';
                 document.getElementById('studentGrade').value = '';
                 document.getElementById('studentClass').value = '';
@@ -697,20 +878,19 @@
 
             } catch (e) {
                 console.error("신청서 제출 오류:", e);
-                alert('신청서 보관 도중 오류가 발생했습니다. 다시 시도해 주세요.');
+                showError('formError', '신청서 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = "📚 도서 신청서 제출하기";
             }
         }
 
-        // ======= 🌓 다크모드 동기화 스크립트 =======
+        // ======= 🌓 다크모드 =======
         function toggleDarkMode() {
             const isDark = document.body.classList.toggle('dark-mode');
             localStorage.setItem('bookRequestDarkMode', isDark ? 'on' : 'off');
             document.getElementById('darkModeBtn').textContent = isDark ? '☀️ 라이트모드' : '🌙 다크모드';
         }
-
         function initDarkMode() {
             if (localStorage.getItem('bookRequestDarkMode') === 'on' || localStorage.getItem('darkMode') === 'on') {
                 document.body.classList.add('dark-mode');
