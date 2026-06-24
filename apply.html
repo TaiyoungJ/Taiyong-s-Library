@@ -520,24 +520,39 @@
                 let exactMatch = false;
                 let suspectMatch = null;
 
-                // 문장 부호, 공백을 파괴하여 순수 뼈대 텍스트만 추출하는 헬퍼 함수
+                // 문장 부호, 공백을 제거하여 순수 뼈대 텍스트만 추출하는 헬퍼 함수
                 const cleanString = str => str.replace(/[^가-힣a-zA-Z0-9]/g, '').toLowerCase().trim();
-                
+
+                // 저자 문자열을 정제된 저자 이름 배열로 변환하는 헬퍼 함수
+                // 예) "류츠신 지음;이현아 옮김" → ["류츠신", "이현아"]
+                const cleanAuthors = str => str.split(';')
+                    .map(part => {
+                        part = part.replace(/\[공\]/g, '');           // [공] 제거
+                        part = part.replace(/[·][가-힣]+/g, '');      // ·사진, ·그림 등 복합 역할어 제거
+                        part = part.replace(/지음|옮김|글|그림|사진|편저|엮음|역|저|편/g, ''); // 역할어 제거
+                        return cleanString(part);
+                    })
+                    .filter(s => s.length > 0);
+
+                // 두 저자 배열 사이에 공통 저자가 하나라도 있으면 true
+                const authorsOverlap = (a, b) => a.some(name => b.includes(name));
+
                 const targetTitleClean = cleanString(title);
-                const targetAuthorClean = cleanString(author);
+                const targetAuthors = cleanAuthors(author);
 
                 allInventory.forEach(doc => {
                     const inv = doc.data();
                     const invTitleClean = cleanString(inv.title || '');
-                    const invAuthorClean = cleanString(inv.author || '');
+                    const invAuthors = cleanAuthors(inv.author || '');
+                    const authorsMatch = authorsOverlap(targetAuthors, invAuthors);
 
-                    // 서명과 저자가 완벽하게 일치하는 경우 (2단계)
-                    if (invTitleClean === targetTitleClean && invAuthorClean === targetAuthorClean) {
+                    // [2단계] 제목과 저자(공통 저자 1명 이상)가 일치하는 경우
+                    if (invTitleClean === targetTitleClean && authorsMatch) {
                         exactMatch = true;
                         suspectMatch = inv;
                     } 
-                    // 저자가 같고, 책 제목이 80% 이상 포함되는 변형 서명인 경우 (3단계 권고안)
-                    else if (invAuthorClean === targetAuthorClean && (invTitleClean.includes(targetTitleClean) || targetTitleClean.includes(invTitleClean))) {
+                    // [3단계] 저자가 겹치고, 제목이 포함관계인 경우 (시리즈·개정판 등)
+                    else if (!exactMatch && authorsMatch && (invTitleClean.includes(targetTitleClean) || targetTitleClean.includes(invTitleClean))) {
                         suspectMatch = inv;
                     }
                 });
@@ -550,7 +565,7 @@
 
                 if (suspectMatch) {
                     badge.classList.add('msg-warn');
-                    badge.innerHTML = `⚠️ 복본 의심 알림: 도서관에 매우 비슷한 도서가 소장되어 있습니다. [${suspectMatch.title}]<br><small>동일 도서의 다른 권수(예: 시리즈물) 분권 신청이 아니라면 반려될 수 있습니다. 진행하시겠습니까?</small>`;
+                    badge.innerHTML = `⚠️ 동일 작품일 수 있습니다. 신청 전 도서관에서 직접 확인해 주세요.<br><small>📖 소장 도서: ${suspectMatch.title} | 저자: ${suspectMatch.author || '미상'} | 청구기호: ${suspectMatch.callNumber || '서가 확인 필요'}</small>`;
                     submitBtn.disabled = false;
                     return;
                 }
