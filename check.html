@@ -11,7 +11,7 @@
         body {
             font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
             font-weight: 400;
-            background-color: #e9ecef;
+            background-color: #f0f4f8;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -19,26 +19,42 @@
             transition: background 0.3s, color 0.3s;
         }
         input, select, button { font-family: inherit; box-sizing: border-box; }
-        .header-area h1, .section-title, .toggle-dark-btn, .back-btn {
+        .header-area h1, .section-title, .back-btn {
             font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
             font-weight: 700;
         }
 
         .app-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 16px; }
 
+        /* === 상단 다크모드 토글 바 === */
+        .top-bar { display: flex; justify-content: flex-end; }
+        .toggle-dark-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            color: #555;
+            padding: 7px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+        }
+        .toggle-dark-btn:hover { background: #f4f6f8; transform: translateY(-1px); }
+
         /* === 헤더 === */
         .header-area {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #2c3e50;
+            background: linear-gradient(135deg, #1a3355 0%, #2c4f7c 100%);
             color: white;
-            padding: 18px 24px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 20px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(26,51,85,0.28);
         }
-        .header-area h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
-        .header-right { display: flex; gap: 8px; align-items: center; }
+        .header-area h1 { margin: 0; font-size: 22px; letter-spacing: 0.5px; }
         .back-btn {
             color: rgba(255,255,255,0.75);
             text-decoration: none;
@@ -50,28 +66,25 @@
             transition: all 0.2s;
         }
         .back-btn:hover { background-color: rgba(255,255,255,0.15); color: white; }
-        .toggle-dark-btn {
-            background-color: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            padding: 8px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s;
-        }
-        .toggle-dark-btn:hover { background-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
 
         /* === 섹션 === */
         .section {
             background-color: white;
             padding: 24px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
+            border-left: 4px solid #3498db;
         }
-        .section-title { font-size: 18px; color: #34495e; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
+        .section-title {
+            font-size: 17px;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #ecf0f1;
+            padding-bottom: 12px;
+        }
 
         /* === 폼 === */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
@@ -103,14 +116,28 @@
             font-family: inherit;
             color: #4a5568;
         }
-        .type-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
-        .type-btn:hover:not(.active) { border-color: #2c3e50; background-color: #edf2f7; }
+        .type-btn.active { background-color: #1a3355; color: white; border-color: #1a3355; }
+        .type-btn:hover:not(.active) { border-color: #1a3355; background-color: #edf2f7; }
 
         /* === 학년/반/번 입력 === */
         .student-info-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .num-input-group  { display: flex; align-items: center; gap: 6px; }
         .num-input-group .form-control { width: 80px; text-align: center; padding: 12px 8px; }
         .num-label { font-size: 15px; color: #4a5568; font-weight: 700; white-space: nowrap; }
+
+        /* === 인라인 에러 === */
+        .inline-error {
+            background: #fdedec;
+            color: #c0392b;
+            border-left: 4px solid #e74c3c;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 
         /* === 조회 버튼 === */
         .search-btn-main {
@@ -127,29 +154,35 @@
             font-family: inherit;
         }
         .search-btn-main:hover { background-color: #2980b9; }
-        .search-btn-main:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .search-btn-main:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        /* === 결과 섹션 === */
+        .section-results { border-left-color: #27ae60; }
 
         /* === 결과 카드 === */
         .result-card {
             display: flex;
             gap: 16px;
             background: #f8f9fa;
-            border: 2px solid #e2e8f0;
+            border: 1px solid #e2e8f0;
+            border-left: 4px solid #e2e8f0;
             border-radius: 10px;
             padding: 16px;
             margin-bottom: 12px;
             transition: border-color 0.2s;
         }
-        .result-card.card-purchased {
-            border-color: #27ae60;
-            background: #f0fdf4;
-        }
+        .result-card.status-waiting  { border-left-color: #3498db; }
+        .result-card.status-approved { border-left-color: #27ae60; }
+        .result-card.status-rejected { border-left-color: #e74c3c; }
+        .result-card.card-purchased  { border-left-color: #155724; background: #f0fdf4; border-color: #a9dfbf; }
+
         .result-thumb { width: 70px; height: 100px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: #edf2f7; }
         .result-info  { flex: 1; display: flex; flex-direction: column; gap: 5px; }
         .result-title { font-size: 16px; font-weight: 700; color: #1a202c; margin: 0; }
         .result-meta  { font-size: 13px; color: #718096; }
         .result-term  { font-size: 12px; color: #a0aec0; }
         .result-date  { font-size: 12px; color: #a0aec0; margin-top: auto; padding-top: 4px; }
+
         .purchased-notice {
             font-size: 13px;
             color: #276749;
@@ -160,12 +193,31 @@
             margin-top: 4px;
         }
 
+        /* === 반려 사유 박스 === */
+        .reject-box {
+            background: #fdedec;
+            border-left: 3px solid #e74c3c;
+            color: #c0392b;
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
         /* === 상태 배지 === */
-        .status-badge  { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
-        .s-waiting    { background-color: #ebf8ff; color: #2b6cb0; }
-        .s-approved   { background-color: #eafaf1; color: #27ae60; }
-        .s-rejected   { background-color: #fdedec; color: #e74c3c; }
-        .s-purchased  { background-color: #d4edda; color: #155724; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .s-waiting   { background-color: #ebf8ff; color: #2b6cb0; }
+        .s-approved  { background-color: #eafaf1; color: #27ae60; }
+        .s-rejected  { background-color: #fdedec; color: #e74c3c; }
+        .s-purchased { background-color: #d4edda; color: #155724; }
+
+        /* === 빈 상태 === */
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-state .empty-icon  { font-size: 44px; margin-bottom: 14px; }
+        .empty-state .empty-title { font-size: 17px; font-weight: 700; color: #2c3e50; margin-bottom: 8px; }
+        .empty-state .empty-desc  { font-size: 14px; color: #7f8c8d; line-height: 1.7; }
 
         /* === 스크롤바 === */
         ::-webkit-scrollbar { width: 6px; }
@@ -174,27 +226,51 @@
 
         /* ========== 다크모드 ========== */
         body.dark-mode {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: linear-gradient(135deg, #0f1f35 0%, #1a2e4a 100%);
             background-attachment: fixed;
             color: #cccccc;
+        }
+        body.dark-mode .toggle-dark-btn {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.18);
+            color: #ccc;
+            box-shadow: none;
+        }
+        body.dark-mode .toggle-dark-btn:hover { background: rgba(255,255,255,0.14); }
+        body.dark-mode .header-area {
+            background: linear-gradient(135deg, #0a1628 0%, #162540 100%);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.5);
         }
         body.dark-mode .section {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.08);
+            border-left: 4px solid #5dade2;
             box-shadow: 0 4px 24px rgba(0,0,0,0.3);
         }
+        body.dark-mode .section-results { border-left-color: #2ecc71 !important; }
         body.dark-mode .section-title { color: #ffffff; border-bottom-color: rgba(255,255,255,0.1); }
         body.dark-mode .form-group label { color: #aaaaaa; }
         body.dark-mode .form-control { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15); color: #ffffff; }
         body.dark-mode .form-control:focus { border-color: #3498db; background: rgba(52,152,219,0.05); }
         body.dark-mode .type-btn { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); color: #cccccc; }
-        body.dark-mode .type-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
+        body.dark-mode .type-btn.active { background-color: #1a3355; color: white; border-color: #1a3355; }
         body.dark-mode .num-label { color: #cccccc; }
-        body.dark-mode .result-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
-        body.dark-mode .result-card.card-purchased { border-color: #27ae60; background: rgba(39,174,96,0.1); }
+        body.dark-mode .result-card {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+            border-left-width: 4px;
+        }
+        body.dark-mode .result-card.status-waiting  { border-left-color: #5dade2; }
+        body.dark-mode .result-card.status-approved { border-left-color: #2ecc71; }
+        body.dark-mode .result-card.status-rejected { border-left-color: #ff6b6b; }
+        body.dark-mode .result-card.card-purchased  { border-left-color: #2ecc71; background: rgba(39,174,96,0.1); border-color: rgba(39,174,96,0.25); }
         body.dark-mode .result-title { color: #ffffff; }
         body.dark-mode .result-meta, body.dark-mode .result-term, body.dark-mode .result-date { color: #a0aec0; }
         body.dark-mode .purchased-notice { background: rgba(39,174,96,0.2); color: #68d391; }
+        body.dark-mode .reject-box { background: rgba(231,76,60,0.15); color: #ff8070; border-left-color: #ff6b6b; }
+        body.dark-mode .empty-state .empty-title { color: #ffffff; }
+        body.dark-mode .empty-state .empty-desc  { color: #a0aec0; }
+        body.dark-mode .inline-error { background: rgba(231,76,60,0.15); color: #ff8070; }
         body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
     </style>
 
@@ -204,12 +280,13 @@
 <body>
     <div class="app-container">
 
+        <div class="top-bar">
+            <button class="toggle-dark-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 다크모드</button>
+        </div>
+
         <div class="header-area">
             <h1>🔍 신청 확인하기</h1>
-            <div class="header-right">
-                <a href="index.html" class="back-btn">← 처음으로</a>
-                <button class="toggle-dark-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 다크모드</button>
-            </div>
+            <a href="index.html" class="back-btn">← 처음으로</a>
         </div>
 
         <div class="section">
@@ -265,10 +342,11 @@
                     </select>
                 </div>
             </div>
+            <div id="searchError" class="inline-error" style="display:none;"></div>
             <button class="search-btn-main" id="searchBtn" onclick="searchMyRequests()">🔍 내 신청 내역 조회하기</button>
         </div>
 
-        <div class="section" id="resultsSection" style="display:none;">
+        <div class="section section-results" id="resultsSection" style="display:none;">
             <div class="section-title" id="resultsTitle">📋 신청 내역</div>
             <div id="resultsContainer"></div>
         </div>
@@ -291,6 +369,15 @@
         let selectedUserType = 'student';
 
         window.addEventListener('DOMContentLoaded', () => { initDarkMode(); });
+
+        // ======= 🔔 인라인 에러 헬퍼 =======
+        function showError(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
 
         // ======= 유형 전환 =======
         function selectType(type) {
@@ -317,9 +404,9 @@
             const name = document.getElementById('searchName').value.trim();
             const info = getSearchInfo();
 
-            if (!name) { alert('성명을 입력해주세요.'); return; }
+            if (!name) { showError('searchError', '✏️ 성명을 입력해주세요.'); return; }
             if (!info) {
-                alert(selectedUserType === 'student'
+                showError('searchError', selectedUserType === 'student'
                     ? '학년, 반, 번호를 모두 입력해주세요.'
                     : '소속 부서를 선택해주세요.');
                 return;
@@ -348,7 +435,7 @@
 
             } catch (e) {
                 console.error(e);
-                alert('조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+                showError('searchError', '조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
             } finally {
                 btn.disabled = false;
                 btn.textContent = '🔍 내 신청 내역 조회하기';
@@ -365,29 +452,40 @@
             title.textContent = '📋 ' + name + '님의 신청 내역 (총 ' + results.length + '건)';
 
             if (results.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#7f8c8d; padding:30px;">신청 내역이 없습니다. 신청자 정보를 다시 확인해주세요. 📭</div>';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">신청 내역이 없습니다</div>
+                        <div class="empty-desc">이름과 학년·반·번호를 정확히 입력했는지 확인해 주세요.<br>신청 내역은 도서 신청 후 바로 조회할 수 있습니다.</div>
+                    </div>`;
                 return;
             }
 
             container.innerHTML = results.map(function(r) {
-                var date      = r.createdAt ? new Date(r.createdAt).toLocaleDateString('ko-KR') : '-';
-                var isPurch   = (r.status === '구매 완료');
-                var badgeCls  = 's-waiting';
-                if (r.status === '승인')    badgeCls = 's-approved';
-                if (r.status === '반려')    badgeCls = 's-rejected';
-                if (isPurch)               badgeCls = 's-purchased';
+                var date     = r.createdAt ? new Date(r.createdAt).toLocaleDateString('ko-KR') : '-';
+                var isPurch  = (r.status === '구매 완료');
+                var badgeCls = 's-waiting';
+                var cardCls  = 'status-waiting';
+                if (r.status === '승인')  { badgeCls = 's-approved'; cardCls = 'status-approved'; }
+                if (r.status === '반려')  { badgeCls = 's-rejected'; cardCls = 'status-rejected'; }
+                if (isPurch)             { badgeCls = 's-purchased'; cardCls = 'card-purchased'; }
 
-                var rejectHtml   = r.rejectReason ? '<span style="font-size:12px; color:#e74c3c; margin-left:6px;">(' + r.rejectReason + ')</span>' : '';
-                var purchaseHtml = isPurch ? '<div class="purchased-notice">🎉 도서가 구입되어 곧 도서관에서 만날 수 있어요!</div>' : '';
-                var thumbSrc     = r.thumbnail || 'https://via.placeholder.com/70x100?text=No+Image';
+                var rejectHtml   = r.rejectReason
+                    ? '<div class="reject-box">💬 반려 사유: ' + r.rejectReason + '</div>'
+                    : '';
+                var purchaseHtml = isPurch
+                    ? '<div class="purchased-notice">🎉 도서가 구입되어 곧 도서관에서 만날 수 있어요!</div>'
+                    : '';
+                var thumbSrc = r.thumbnail || 'https://via.placeholder.com/70x100?text=No+Image';
 
-                return '<div class="result-card' + (isPurch ? ' card-purchased' : '') + '">'
+                return '<div class="result-card ' + cardCls + '">'
                     + '<img src="' + thumbSrc + '" class="result-thumb" alt="표지">'
                     + '<div class="result-info">'
                     + '<div class="result-title">' + r.title + '</div>'
                     + '<div class="result-meta">' + r.author + ' | ' + r.publisher + '</div>'
                     + '<div class="result-term">📌 ' + (r.term || '-') + '</div>'
-                    + '<div style="margin-top:6px;"><span class="status-badge ' + badgeCls + '">' + r.status + '</span>' + rejectHtml + '</div>'
+                    + '<div style="margin-top:6px;"><span class="status-badge ' + badgeCls + '">' + r.status + '</span></div>'
+                    + rejectHtml
                     + purchaseHtml
                     + '<div class="result-date">신청일: ' + date + '</div>'
                     + '</div></div>';
