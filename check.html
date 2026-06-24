@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 신청 확인</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            font-weight: 400;
+            background-color: #e9ecef;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            transition: background 0.3s, color 0.3s;
+        }
+        input, select, button { font-family: inherit; box-sizing: border-box; }
+        .header-area h1, .section-title, .toggle-dark-btn, .back-btn {
+            font-family: 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            font-weight: 700;
+        }
+
+        .app-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 16px; }
+
+        /* === 헤더 === */
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3e50;
+            color: white;
+            padding: 18px 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-area h1 { margin: 0; font-size: 22px; letter-spacing: 1px; }
+        .header-right { display: flex; gap: 8px; align-items: center; }
+        .back-btn {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 14px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s;
+        }
+        .back-btn:hover { background-color: rgba(255,255,255,0.15); color: white; }
+        .toggle-dark-btn {
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        .toggle-dark-btn:hover { background-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+        /* === 섹션 === */
+        .section {
+            background-color: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .section-title { font-size: 18px; color: #34495e; margin-top: 0; margin-bottom: 16px; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; }
+
+        /* === 폼 === */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-group label { font-size: 14px; font-weight: 700; color: #4a5568; }
+        .form-control {
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 15px;
+            background-color: #f8f9fa;
+        }
+        .form-control:focus { outline: none; border-color: #3498db; background-color: white; }
+
+        /* === 유형 토글 === */
+        .type-toggle { display: flex; gap: 8px; }
+        .type-btn {
+            flex: 1;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: 2px solid #bdc3c7;
+            background: #f8f9fa;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            color: #4a5568;
+        }
+        .type-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
+        .type-btn:hover:not(.active) { border-color: #2c3e50; background-color: #edf2f7; }
+
+        /* === 학년/반/번 입력 === */
+        .student-info-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .num-input-group  { display: flex; align-items: center; gap: 6px; }
+        .num-input-group .form-control { width: 80px; text-align: center; padding: 12px 8px; }
+        .num-label { font-size: 15px; color: #4a5568; font-weight: 700; white-space: nowrap; }
+
+        /* === 조회 버튼 === */
+        .search-btn-main {
+            width: 100%;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        .search-btn-main:hover { background-color: #2980b9; }
+        .search-btn-main:disabled { background-color: #95a5a6; cursor: not-allowed; }
+
+        /* === 결과 카드 === */
+        .result-card {
+            display: flex;
+            gap: 16px;
+            background: #f8f9fa;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+        .result-card.card-purchased {
+            border-color: #27ae60;
+            background: #f0fdf4;
+        }
+        .result-thumb { width: 70px; height: 100px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: #edf2f7; }
+        .result-info  { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .result-title { font-size: 16px; font-weight: 700; color: #1a202c; margin: 0; }
+        .result-meta  { font-size: 13px; color: #718096; }
+        .result-term  { font-size: 12px; color: #a0aec0; }
+        .result-date  { font-size: 12px; color: #a0aec0; margin-top: auto; padding-top: 4px; }
+        .purchased-notice {
+            font-size: 13px;
+            color: #276749;
+            font-weight: 700;
+            background: #c6f6d5;
+            padding: 7px 12px;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+
+        /* === 상태 배지 === */
+        .status-badge  { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .s-waiting    { background-color: #ebf8ff; color: #2b6cb0; }
+        .s-approved   { background-color: #eafaf1; color: #27ae60; }
+        .s-rejected   { background-color: #fdedec; color: #e74c3c; }
+        .s-purchased  { background-color: #d4edda; color: #155724; }
+
+        /* === 스크롤바 === */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.03); }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+
+        /* ========== 다크모드 ========== */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background-attachment: fixed;
+            color: #cccccc;
+        }
+        body.dark-mode .section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+        }
+        body.dark-mode .section-title { color: #ffffff; border-bottom-color: rgba(255,255,255,0.1); }
+        body.dark-mode .form-group label { color: #aaaaaa; }
+        body.dark-mode .form-control { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15); color: #ffffff; }
+        body.dark-mode .form-control:focus { border-color: #3498db; background: rgba(52,152,219,0.05); }
+        body.dark-mode .type-btn { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); color: #cccccc; }
+        body.dark-mode .type-btn.active { background-color: #2c3e50; color: white; border-color: #2c3e50; }
+        body.dark-mode .num-label { color: #cccccc; }
+        body.dark-mode .result-card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); }
+        body.dark-mode .result-card.card-purchased { border-color: #27ae60; background: rgba(39,174,96,0.1); }
+        body.dark-mode .result-title { color: #ffffff; }
+        body.dark-mode .result-meta, body.dark-mode .result-term, body.dark-mode .result-date { color: #a0aec0; }
+        body.dark-mode .purchased-notice { background: rgba(39,174,96,0.2); color: #68d391; }
+        body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="app-container">
+
+        <div class="header-area">
+            <h1>🔍 신청 확인하기</h1>
+            <div class="header-right">
+                <a href="index.html" class="back-btn">← 처음으로</a>
+                <button class="toggle-dark-btn" id="darkModeBtn" onclick="toggleDarkMode()">🌙 다크모드</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">👤 신청자 정보 입력</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="searchName">신청자 성명</label>
+                    <input type="text" id="searchName" class="form-control" placeholder="이름을 입력하세요" onkeydown="if(event.key==='Enter') searchMyRequests()">
+                </div>
+                <div class="form-group">
+                    <label>신청자 유형</label>
+                    <div class="type-toggle">
+                        <button type="button" class="type-btn active" id="typeStudent" onclick="selectType('student')">🎒 학생</button>
+                        <button type="button" class="type-btn" id="typeTeacher" onclick="selectType('teacher')">👨‍🏫 교직원</button>
+                    </div>
+                </div>
+                <div class="form-group full-width" id="studentFields">
+                    <label>소속 학년 / 반 / 번호</label>
+                    <div class="student-info-row">
+                        <div class="num-input-group">
+                            <input type="number" id="searchGrade" class="form-control" min="1" max="3" placeholder="학년" onkeydown="if(event.key==='Enter') searchMyRequests()">
+                            <span class="num-label">학년</span>
+                        </div>
+                        <div class="num-input-group">
+                            <input type="number" id="searchClass" class="form-control" min="1" max="9" placeholder="반" onkeydown="if(event.key==='Enter') searchMyRequests()">
+                            <span class="num-label">반</span>
+                        </div>
+                        <div class="num-input-group">
+                            <input type="number" id="searchNumber" class="form-control" min="1" max="40" placeholder="번호" onkeydown="if(event.key==='Enter') searchMyRequests()">
+                            <span class="num-label">번</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group full-width" id="teacherFields" style="display:none;">
+                    <label for="searchDept">소속 부서</label>
+                    <select id="searchDept" class="form-control">
+                        <option value="">부서를 선택하세요</option>
+                        <option>교무부</option>
+                        <option>교육과정부</option>
+                        <option>1학년부</option>
+                        <option>2학년부</option>
+                        <option>3학년부</option>
+                        <option>과학정보부</option>
+                        <option>학생생활지원부</option>
+                        <option>건강체육부</option>
+                        <option>인문사회부</option>
+                        <option>진로진학지원부</option>
+                        <option>행정실</option>
+                        <option>연구부</option>
+                        <option>행정실장</option>
+                        <option>교감</option>
+                        <option>교장</option>
+                    </select>
+                </div>
+            </div>
+            <button class="search-btn-main" id="searchBtn" onclick="searchMyRequests()">🔍 내 신청 내역 조회하기</button>
+        </div>
+
+        <div class="section" id="resultsSection" style="display:none;">
+            <div class="section-title" id="resultsTitle">📋 신청 내역</div>
+            <div id="resultsContainer"></div>
+        </div>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaQkm4VDvmLVmltgwLwN3uYP-ShC6Pb3o",
+            authDomain: "school-briefing-a5ab2.firebaseapp.com",
+            projectId: "school-briefing-a5ab2",
+            storageBucket: "school-briefing-a5ab2.firebasestorage.app",
+            messagingSenderId: "898677514153",
+            appId: "1:898677514153:web:cff731e4ff2c408c156eb8",
+            measurementId: "G-M1SQXZ2LZQ"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const fbDb = firebase.firestore();
+
+        let selectedUserType = 'student';
+
+        window.addEventListener('DOMContentLoaded', () => { initDarkMode(); });
+
+        // ======= 유형 전환 =======
+        function selectType(type) {
+            selectedUserType = type;
+            document.getElementById('typeStudent').classList.toggle('active', type === 'student');
+            document.getElementById('typeTeacher').classList.toggle('active', type === 'teacher');
+            document.getElementById('studentFields').style.display = type === 'student' ? 'flex' : 'none';
+            document.getElementById('teacherFields').style.display = type === 'teacher' ? 'flex' : 'none';
+        }
+
+        function getSearchInfo() {
+            if (selectedUserType === 'student') {
+                const g = parseInt(document.getElementById('searchGrade').value);
+                const c = parseInt(document.getElementById('searchClass').value);
+                const n = parseInt(document.getElementById('searchNumber').value);
+                if (!g || !c || !n) return null;
+                return g + '학년 ' + c + '반 ' + n + '번';
+            }
+            return document.getElementById('searchDept').value || null;
+        }
+
+        // ======= 조회 실행 =======
+        async function searchMyRequests() {
+            const name = document.getElementById('searchName').value.trim();
+            const info = getSearchInfo();
+
+            if (!name) { alert('성명을 입력해주세요.'); return; }
+            if (!info) {
+                alert(selectedUserType === 'student'
+                    ? '학년, 반, 번호를 모두 입력해주세요.'
+                    : '소속 부서를 선택해주세요.');
+                return;
+            }
+
+            const btn = document.getElementById('searchBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ 조회 중...';
+
+            try {
+                const [reqSnap, archSnap] = await Promise.all([
+                    fbDb.collection('bookRequests').where('studentName', '==', name).get(),
+                    fbDb.collection('bookRequestsArchive').where('studentName', '==', name).get()
+                ]);
+
+                const results = [];
+                reqSnap.docs.forEach(doc => {
+                    if (doc.data().studentInfo === info) results.push(doc.data());
+                });
+                archSnap.docs.forEach(doc => {
+                    if (doc.data().studentInfo === info) results.push(doc.data());
+                });
+
+                results.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                displayResults(name, results);
+
+            } catch (e) {
+                console.error(e);
+                alert('조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 내 신청 내역 조회하기';
+            }
+        }
+
+        // ======= 결과 렌더링 =======
+        function displayResults(name, results) {
+            const section   = document.getElementById('resultsSection');
+            const title     = document.getElementById('resultsTitle');
+            const container = document.getElementById('resultsContainer');
+
+            section.style.display = 'flex';
+            title.textContent = '📋 ' + name + '님의 신청 내역 (총 ' + results.length + '건)';
+
+            if (results.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#7f8c8d; padding:30px;">신청 내역이 없습니다. 신청자 정보를 다시 확인해주세요. 📭</div>';
+                return;
+            }
+
+            container.innerHTML = results.map(function(r) {
+                var date      = r.createdAt ? new Date(r.createdAt).toLocaleDateString('ko-KR') : '-';
+                var isPurch   = (r.status === '구매 완료');
+                var badgeCls  = 's-waiting';
+                if (r.status === '승인')    badgeCls = 's-approved';
+                if (r.status === '반려')    badgeCls = 's-rejected';
+                if (isPurch)               badgeCls = 's-purchased';
+
+                var rejectHtml   = r.rejectReason ? '<span style="font-size:12px; color:#e74c3c; margin-left:6px;">(' + r.rejectReason + ')</span>' : '';
+                var purchaseHtml = isPurch ? '<div class="purchased-notice">🎉 도서가 구입되어 곧 도서관에서 만날 수 있어요!</div>' : '';
+                var thumbSrc     = r.thumbnail || 'https://via.placeholder.com/70x100?text=No+Image';
+
+                return '<div class="result-card' + (isPurch ? ' card-purchased' : '') + '">'
+                    + '<img src="' + thumbSrc + '" class="result-thumb" alt="표지">'
+                    + '<div class="result-info">'
+                    + '<div class="result-title">' + r.title + '</div>'
+                    + '<div class="result-meta">' + r.author + ' | ' + r.publisher + '</div>'
+                    + '<div class="result-term">📌 ' + (r.term || '-') + '</div>'
+                    + '<div style="margin-top:6px;"><span class="status-badge ' + badgeCls + '">' + r.status + '</span>' + rejectHtml + '</div>'
+                    + purchaseHtml
+                    + '<div class="result-date">신청일: ' + date + '</div>'
+                    + '</div></div>';
+            }).join('');
+        }
+
+        // ======= 다크모드 =======
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('bookRequestDarkMode', isDark ? 'on' : 'off');
+            document.getElementById('darkModeBtn').textContent = isDark ? '☀️ 라이트모드' : '🌙 다크모드';
+        }
+        function initDarkMode() {
+            if (localStorage.getItem('bookRequestDarkMode') === 'on' || localStorage.getItem('darkMode') === 'on') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeBtn').textContent = '☀️ 라이트모드';
+            }
+        }
+    </script>
+</body>
+</html>
