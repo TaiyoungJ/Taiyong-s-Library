@@ -403,6 +403,7 @@
         let selectedBook = null;
         let selectedUserType = 'student';
         let currentActiveTerm = "2026년 3차 도서신청"; // 기본값 (DB 로드 실패 시 적용)
+        let allInventoryCache = null; // 소장 목록 캐시 (페이지 로드 시 한 번만 불러옴)
 
         // 로드 시 초기화
         window.addEventListener('DOMContentLoaded', async () => {
@@ -419,9 +420,16 @@
                     currentActiveTerm = configDoc.data().currentTerm;
                 }
                 document.getElementById('currentTermText').textContent = currentActiveTerm;
+
+                // 소장 목록 전체를 여기서 딱 한 번만 불러와 캐시에 저장
+                // 이후 복본 검색은 Firebase를 다시 찌르지 않고 이 캐시에서 비교
+                const inventorySnap = await fbDb.collection('libraryInventory').get();
+                allInventoryCache = inventorySnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
             } catch (e) {
                 console.error("차수 로드 실패, 기본값으로 작동합니다:", e);
                 document.getElementById('currentTermText').textContent = currentActiveTerm;
+                allInventoryCache = []; // 로드 실패 시 빈 배열로 초기화
             }
         }
 
@@ -514,8 +522,8 @@
                 }
 
                 // [2단계 & 3단계] 제목과 저자를 기반으로 정밀 매칭 및 유사도 검사
-                const inventoryRef = fbDb.collection('libraryInventory');
-                const allInventory = await inventoryRef.get();
+                // Firebase를 다시 찌르지 않고 페이지 로드 시 불러온 캐시에서 비교
+                const inventoryData = allInventoryCache || [];
                 
                 let exactMatch = false;
                 let suspectMatch = null;
@@ -540,8 +548,7 @@
                 const targetTitleClean = cleanString(title);
                 const targetAuthors = cleanAuthors(author);
 
-                allInventory.forEach(doc => {
-                    const inv = doc.data();
+                inventoryData.forEach(inv => {
                     const invTitleClean = cleanString(inv.title || '');
                     const invAuthors = cleanAuthors(inv.author || '');
                     const authorsMatch = authorsOverlap(targetAuthors, invAuthors);
