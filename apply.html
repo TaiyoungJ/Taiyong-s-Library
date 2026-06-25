@@ -439,10 +439,10 @@
         <div class="section section-search">
             <div class="section-title">
                 <span class="step-num step-1">1</span>
-                신청할 도서 검색하기
+                신규 도서 검색
             </div>
             <div class="search-row">
-                <input type="text" id="bookSearchInput" class="search-input" placeholder="책 제목, 저자 또는 ISBN을 입력하세요..." onkeydown="if(event.key==='Enter') searchBooks()">
+                <input type="text" id="bookSearchInput" class="search-input" placeholder="신청할 도서를 검색하세요..." onkeydown="if(event.key==='Enter') searchBooks()">
                 <button class="search-btn" onclick="searchBooks()">검색</button>
             </div>
             <div id="searchError" class="inline-error" style="display:none;"></div>
@@ -455,7 +455,7 @@
         <div class="section section-form">
             <div class="section-title">
                 <span class="step-num step-2">2</span>
-                신청자 정보 및 사유 입력
+                신청서 작성
             </div>
 
             <!-- 선택된 책 프리뷰 -->
