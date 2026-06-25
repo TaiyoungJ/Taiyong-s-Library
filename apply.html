@@ -926,10 +926,11 @@
 
         function confirmModalSelect() {
             if (pendingModalIdx === null) return;
-            const book = window.searchedBooksCache[pendingModalIdx];
+            const idx = pendingModalIdx;
+            const book = window.searchedBooksCache[idx];
             const isbn = book.isbn.split(' ')[1] || book.isbn.split(' ')[0] || '없음';
             closeBookModal();
-            selectBook(pendingModalIdx, book.title, book.authors.join(', '), book.publisher, isbn, book.thumbnail || '');
+            selectBook(idx, book.title, book.authors.join(', '), book.publisher, isbn, book.thumbnail || '');
         }
 
         // ======= 📚 책 선택 및 복본 검증 =======
