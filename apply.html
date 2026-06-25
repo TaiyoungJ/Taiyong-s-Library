@@ -1099,7 +1099,7 @@
 
             const submitBtn = document.getElementById('submitRequestBtn');
             submitBtn.disabled = true;
-            submitBtn.textContent = "⏳ 신청서를 금고에 저장하는 중...";
+            submitBtn.textContent = "⏳ 신청서를 제출하는 중...";
 
             try {
                 const requestQuery = await fbDb.collection('bookRequests')
@@ -1132,7 +1132,7 @@
                     createdAt: Date.now()
                 });
 
-                showSuccess('formSuccess', `🎉 도서 신청이 정상적으로 접수되었습니다! 관리자 선생님의 승인 후 구매가 확정됩니다.`);
+                showSuccess('formSuccess', `🎉 도서 신청이 정상적으로 접수되었습니다!`);
 
                 // 폼 리셋
                 document.getElementById('requestReason').value = "";
