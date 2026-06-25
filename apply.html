@@ -862,9 +862,29 @@
 
             const descEl = document.getElementById('modalDesc');
             const moreBtn = document.getElementById('modalMoreBtn');
-            const descText = book.contents || '소개 정보가 없습니다.';
-            descEl.textContent = descText;
+            const rawDesc = book.contents || '';
+            const descText = rawDesc ? rawDesc.trimEnd() + '...' : '소개 정보가 없습니다.';
+            const bookUrl = book.url || '';
+
+            descEl.innerHTML = '';
             descEl.classList.remove('expanded');
+
+            const textNode = document.createTextNode(descText);
+            descEl.appendChild(textNode);
+
+            if (bookUrl) {
+                const br = document.createElement('br');
+                descEl.appendChild(br);
+                const link = document.createElement('a');
+                link.href = bookUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = '👉 더 읽어보기';
+                link.style.cssText = 'font-size:13px; color:#3498db; font-weight:700; text-decoration:none; margin-top:8px; display:inline-block;';
+                link.addEventListener('mouseover', () => link.style.textDecoration = 'underline');
+                link.addEventListener('mouseout', () => link.style.textDecoration = 'none');
+                descEl.appendChild(link);
+            }
 
             // 5줄 초과 여부는 렌더링 후 판단
             setTimeout(() => {
