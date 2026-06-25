@@ -412,6 +412,143 @@
         body.dark-mode .inline-success { background: rgba(39,174,96,0.15); color: #68d391; }
         body.dark-mode ::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
         body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+
+        /* ==========================================
+           📖 책 상세 모달
+           ========================================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: white;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+            animation: modalIn 0.2s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-header {
+            display: flex;
+            gap: 16px;
+            padding: 20px;
+            border-bottom: 1px solid #ecf0f1;
+            align-items: flex-start;
+        }
+        .modal-thumb {
+            width: 80px;
+            height: 114px;
+            object-fit: cover;
+            border-radius: 6px;
+            flex-shrink: 0;
+            background: #edf2f7;
+        }
+        .modal-thumb-empty {
+            width: 80px;
+            height: 114px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            background: linear-gradient(145deg, #edf2f7, #e2e8f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #a0aec0;
+        }
+        .modal-meta { flex: 1; display: flex; flex-direction: column; gap: 5px; padding-top: 2px; }
+        .modal-title { font-size: 17px; font-weight: 700; color: #1a202c; margin: 0; line-height: 1.4; }
+        .modal-author { font-size: 14px; color: #4a5568; margin: 0; }
+        .modal-publisher { font-size: 13px; color: #718096; margin: 0; }
+        .modal-isbn { font-size: 12px; color: #a0aec0; margin: 0; }
+
+        .modal-body { padding: 18px 20px; border-bottom: 1px solid #ecf0f1; }
+        .modal-body-label { font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+
+        .modal-desc-wrap { position: relative; }
+        .modal-desc {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.75;
+            margin: 0;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5;
+            -webkit-box-orient: vertical;
+        }
+        .modal-desc.expanded {
+            display: block;
+            -webkit-line-clamp: unset;
+        }
+        .modal-more-btn {
+            margin-top: 8px;
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0;
+            font-family: inherit;
+        }
+        .modal-more-btn:hover { text-decoration: underline; }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+        }
+        .modal-back-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+            background: white;
+            font-size: 14px;
+            font-weight: 700;
+            color: #4a5568;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .modal-back-btn:hover { background: #f4f6f8; }
+        .modal-select-btn {
+            flex: 2;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #27ae60;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .modal-select-btn:hover { background: #219a52; }
+
+        /* 다크모드 모달 */
+        body.dark-mode .modal-box { background: #1c2b3a; }
+        body.dark-mode .modal-header { border-bottom-color: rgba(255,255,255,0.1); }
+        body.dark-mode .modal-title { color: #ffffff; }
+        body.dark-mode .modal-author { color: #cccccc; }
+        body.dark-mode .modal-publisher, body.dark-mode .modal-isbn { color: #778899; }
+        body.dark-mode .modal-body { border-bottom-color: rgba(255,255,255,0.1); }
+        body.dark-mode .modal-desc { color: #aaaaaa; }
+        body.dark-mode .modal-back-btn { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); color: #cccccc; }
+        body.dark-mode .modal-back-btn:hover { background: rgba(255,255,255,0.1); }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -546,6 +683,34 @@
 
     </div>
 
+    <!-- 📖 책 상세 모달 -->
+    <div class="modal-overlay" id="bookModal" onclick="handleModalOverlayClick(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <img id="modalThumb" class="modal-thumb" src="" alt="표지"
+                     onerror="this.style.display='none'; document.getElementById('modalThumbEmpty').style.display='flex'">
+                <div id="modalThumbEmpty" class="modal-thumb-empty" style="display:none;">📚</div>
+                <div class="modal-meta">
+                    <p id="modalTitle" class="modal-title"></p>
+                    <p id="modalAuthor" class="modal-author"></p>
+                    <p id="modalPublisher" class="modal-publisher"></p>
+                    <p id="modalIsbn" class="modal-isbn"></p>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body-label">📖 책 소개</div>
+                <div class="modal-desc-wrap">
+                    <p id="modalDesc" class="modal-desc">소개 정보가 없습니다.</p>
+                    <button id="modalMoreBtn" class="modal-more-btn" onclick="toggleModalDesc()" style="display:none;">▼ 더 보기</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-back-btn" onclick="closeBookModal()">← 돌아가기</button>
+                <button class="modal-select-btn" id="modalSelectBtn" onclick="confirmModalSelect()">✅ 이 책 선택하기</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================
         // 🗄️ Firebase 설정
@@ -647,7 +812,7 @@
                         : `<div class="book-thumb-empty">📚</div>`;
 
                     return `
-                        <div class="book-card" id="bookCard_${idx}" onclick="selectBook(${idx}, '${escapedTitle}', '${escapedAuthor}', '${escapedPub}', '${isbn}', '${escapedThumb}')">
+                        <div class="book-card" id="bookCard_${idx}" onclick="openBookModal(${idx})">
                             ${thumbHtml}
                             <div class="book-info">
                                 <h4 class="book-title">${book.title}</h4>
@@ -664,6 +829,87 @@
                 console.error("검색 오류:", e);
                 container.innerHTML = `<div style="text-align: center; color: #e74c3c; padding: 20px;">❌ 통신 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.</div>`;
             }
+        }
+
+        // ======= 📖 책 상세 모달 =======
+        let pendingModalIdx = null;
+        let descExpanded = false;
+
+        function openBookModal(idx) {
+            const book = window.searchedBooksCache[idx];
+            if (!book) return;
+
+            pendingModalIdx = idx;
+            descExpanded = false;
+
+            const isbn = book.isbn.split(' ')[1] || book.isbn.split(' ')[0] || '없음';
+            const thumb = document.getElementById('modalThumb');
+            const thumbEmpty = document.getElementById('modalThumbEmpty');
+
+            if (book.thumbnail) {
+                thumb.src = book.thumbnail;
+                thumb.style.display = 'block';
+                thumbEmpty.style.display = 'none';
+            } else {
+                thumb.style.display = 'none';
+                thumbEmpty.style.display = 'flex';
+            }
+
+            document.getElementById('modalTitle').textContent = book.title;
+            document.getElementById('modalAuthor').textContent = book.authors.join(', ') || '저자 미상';
+            document.getElementById('modalPublisher').textContent = book.publisher + (book.datetime ? ' · ' + book.datetime.slice(0, 4) : '');
+            document.getElementById('modalIsbn').textContent = 'ISBN ' + isbn;
+
+            const descEl = document.getElementById('modalDesc');
+            const moreBtn = document.getElementById('modalMoreBtn');
+            const descText = book.contents || '소개 정보가 없습니다.';
+            descEl.textContent = descText;
+            descEl.classList.remove('expanded');
+
+            // 5줄 초과 여부는 렌더링 후 판단
+            setTimeout(() => {
+                const lineHeight = parseFloat(getComputedStyle(descEl).lineHeight);
+                const maxHeight = lineHeight * 5;
+                if (descEl.scrollHeight > maxHeight + 4) {
+                    moreBtn.style.display = 'block';
+                    moreBtn.textContent = '▼ 더 보기';
+                } else {
+                    moreBtn.style.display = 'none';
+                }
+            }, 0);
+
+            document.getElementById('bookModal').classList.add('active');
+            document.addEventListener('keydown', handleModalEsc);
+        }
+
+        function closeBookModal() {
+            document.getElementById('bookModal').classList.remove('active');
+            document.removeEventListener('keydown', handleModalEsc);
+            pendingModalIdx = null;
+        }
+
+        function handleModalOverlayClick(e) {
+            if (e.target === document.getElementById('bookModal')) closeBookModal();
+        }
+
+        function handleModalEsc(e) {
+            if (e.key === 'Escape') closeBookModal();
+        }
+
+        function toggleModalDesc() {
+            const descEl = document.getElementById('modalDesc');
+            const moreBtn = document.getElementById('modalMoreBtn');
+            descExpanded = !descExpanded;
+            descEl.classList.toggle('expanded', descExpanded);
+            moreBtn.textContent = descExpanded ? '▲ 접기' : '▼ 더 보기';
+        }
+
+        function confirmModalSelect() {
+            if (pendingModalIdx === null) return;
+            const book = window.searchedBooksCache[pendingModalIdx];
+            const isbn = book.isbn.split(' ')[1] || book.isbn.split(' ')[0] || '없음';
+            closeBookModal();
+            selectBook(pendingModalIdx, book.title, book.authors.join(', '), book.publisher, isbn, book.thumbnail || '');
         }
 
         // ======= 📚 책 선택 및 복본 검증 =======
