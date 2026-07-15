@@ -91,6 +91,7 @@
             border-top: 5px solid transparent;
         }
         .landing-card:hover { transform: translateY(-6px); box-shadow: 0 10px 32px rgba(0,0,0,0.13); }
+        .card-search { border-top-color: #8e44ad; }
         .card-apply { border-top-color: #27ae60; }
         .card-check { border-top-color: #3498db; }
 
@@ -106,6 +107,7 @@
             margin-bottom: 4px;
             flex-shrink: 0;
         }
+        .card-search .card-icon-wrap { background: linear-gradient(135deg, #ebdef0, #d2b4de); }
         .card-apply .card-icon-wrap { background: linear-gradient(135deg, #d5f5e3, #a9dfbf); }
         .card-check .card-icon-wrap { background: linear-gradient(135deg, #d6eaf8, #a9cce3); }
 
@@ -125,6 +127,7 @@
             margin-top: 6px;
         }
         .card-btn:hover { opacity: 0.88; transform: scale(1.03); }
+        .card-search .card-btn { background-color: #8e44ad; }
         .card-apply .card-btn { background-color: #27ae60; }
         .card-check .card-btn { background-color: #3498db; }
 
@@ -149,8 +152,10 @@
             background: rgba(255,255,255,0.05);
             box-shadow: 0 4px 24px rgba(0,0,0,0.3);
         }
+        body.dark-mode .card-search { border-top-color: #bb8fce; }
         body.dark-mode .card-apply { border-top-color: #2ecc71; }
         body.dark-mode .card-check { border-top-color: #5dade2; }
+        body.dark-mode .card-search .card-icon-wrap { background: rgba(187,143,206,0.15); }
         body.dark-mode .card-apply .card-icon-wrap { background: rgba(46,204,113,0.15); }
         body.dark-mode .card-check .card-icon-wrap { background: rgba(93,173,226,0.15); }
         body.dark-mode .card-title  { color: #ffffff; }
@@ -177,6 +182,12 @@
         <p class="landing-subtitle">아래 메뉴에서 원하는 항목을 선택해 주세요.</p>
 
         <div class="landing-grid">
+            <a href="https://read365.edunet.net/PureScreen/SchoolSearch?schoolName=%EC%83%81%EA%B3%84%EA%B3%A0%EB%93%B1%ED%95%99%EA%B5%90&provCode=B10&neisCode=B100000449" class="landing-card card-search" target="_blank" rel="noopener noreferrer">
+                <div class="card-icon-wrap">🔎</div>
+                <div class="card-title">장서 검색</div>
+                <div class="card-desc">우리 학교 도서관에 있는<br>책을 검색합니다.</div>
+                <button class="card-btn">검색하러 가기 →</button>
+            </a>
             <a href="apply.html" class="landing-card card-apply">
                 <div class="card-icon-wrap">📚</div>
                 <div class="card-title">도서 신청하기</div>
