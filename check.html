@@ -108,6 +108,32 @@
             background-color: #f8f9fa;
         }
         .form-control:focus { outline: none; border-color: #3498db; background-color: white; }
+        .field-hint { font-size: 12px; color: #7f8c8d; margin-top: 2px; line-height: 1.5; }
+
+        /* === 임시 비밀번호 안내 === */
+        .info-notice {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            border-left: 4px solid #3498db;
+            padding: 11px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .info-notice strong { font-weight: 700; }
+
+        /* === 비밀번호 안내 알림 === */
+        .lock-notice {
+            background: #fff8e1;
+            color: #8a6d3b;
+            border-left: 4px solid #f0ad4e;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
 
         /* === 유형 토글 === */
         .type-toggle { display: flex; gap: 8px; }
@@ -258,6 +284,9 @@
         body.dark-mode .section-results { border-left-color: #2ecc71 !important; }
         body.dark-mode .section-title { color: #ffffff; border-bottom-color: rgba(255,255,255,0.1); }
         body.dark-mode .form-group label { color: #aaaaaa; }
+        body.dark-mode .field-hint { color: #8a9bb0; }
+        body.dark-mode .lock-notice { background: rgba(240,173,78,0.12); color: #f0c674; border-left-color: #f0ad4e; }
+        body.dark-mode .info-notice { background: rgba(52,152,219,0.12); color: #7fc4f0; border-left-color: #3498db; }
         body.dark-mode .form-control { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.15); color: #ffffff; }
         body.dark-mode .form-control:focus { border-color: #3498db; background: rgba(52,152,219,0.05); }
         body.dark-mode .type-btn { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); color: #cccccc; }
@@ -300,55 +329,18 @@
         <div class="section">
             <div class="section-title">👤 신청자 정보 입력</div>
             <div class="form-grid">
-                <div class="form-group">
+                <div class="form-group full-width">
                     <label for="searchName">신청자 성명</label>
                     <input type="text" id="searchName" class="form-control" placeholder="이름을 입력하세요" onkeydown="if(event.key==='Enter') searchMyRequests()">
                 </div>
-                <div class="form-group">
-                    <label>신청자 유형</label>
-                    <div class="type-toggle">
-                        <button type="button" class="type-btn active" id="typeStudent" onclick="selectType('student')">🎒 학생</button>
-                        <button type="button" class="type-btn" id="typeTeacher" onclick="selectType('teacher')">👨‍🏫 교직원</button>
-                    </div>
+                <div class="form-group full-width">
+                    <label for="searchPassword">🔒 조회용 비밀번호</label>
+                    <input type="password" id="searchPassword" class="form-control" placeholder="신청 시 설정한 비밀번호를 입력하세요" autocomplete="off" maxlength="30" onkeydown="if(event.key==='Enter') searchMyRequests()">
+                    <small class="field-hint">신청할 때 설정한 이름과 비밀번호로 본인 신청 내역을 확인합니다.</small>
                 </div>
-                <div class="form-group full-width" id="studentFields">
-                    <label>소속 학년 / 반 / 번호</label>
-                    <div class="student-info-row">
-                        <div class="num-input-group">
-                            <input type="number" id="searchGrade" class="form-control" min="1" max="3" placeholder="학년" onkeydown="if(event.key==='Enter') searchMyRequests()">
-                            <span class="num-label">학년</span>
-                        </div>
-                        <div class="num-input-group">
-                            <input type="number" id="searchClass" class="form-control" min="1" max="9" placeholder="반" onkeydown="if(event.key==='Enter') searchMyRequests()">
-                            <span class="num-label">반</span>
-                        </div>
-                        <div class="num-input-group">
-                            <input type="number" id="searchNumber" class="form-control" min="1" max="40" placeholder="번호" onkeydown="if(event.key==='Enter') searchMyRequests()">
-                            <span class="num-label">번</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group full-width" id="teacherFields" style="display:none;">
-                    <label for="searchDept">소속 부서</label>
-                    <select id="searchDept" class="form-control">
-                        <option value="">부서를 선택하세요</option>
-                        <option>교무부</option>
-                        <option>교육과정부</option>
-                        <option>1학년부</option>
-                        <option>2학년부</option>
-                        <option>3학년부</option>
-                        <option>과학정보부</option>
-                        <option>학생생활지원부</option>
-                        <option>건강체육부</option>
-                        <option>인문사회부</option>
-                        <option>진로진학지원부</option>
-                        <option>행정실</option>
-                        <option>연구부</option>
-                        <option>행정실장</option>
-                        <option>교감</option>
-                        <option>교장</option>
-                    </select>
-                </div>
+            </div>
+            <div class="info-notice">
+                💡 <strong>비밀번호를 등록하기 전에 신청</strong>했거나, <strong>관리자가 비밀번호를 초기화</strong>한 경우에는 임시 비밀번호 <strong>12345</strong> 를 입력해 주세요.
             </div>
             <div id="searchError" class="inline-error" style="display:none;"></div>
             <button class="search-btn-main" id="searchBtn" onclick="searchMyRequests()">🔍 내 신청 내역 조회하기</button>
@@ -374,7 +366,8 @@
         firebase.initializeApp(firebaseConfig);
         const fbDb = firebase.firestore();
 
-        let selectedUserType = 'student';
+        // 비밀번호 등록 전 신청분 · 관리자 초기화 시 사용하는 임시 비밀번호
+        const TEMP_PASSWORD = '12345';
 
         window.addEventListener('DOMContentLoaded', () => { initDarkMode(); });
 
@@ -387,59 +380,54 @@
             setTimeout(() => { el.style.display = 'none'; }, 5000);
         }
 
-        // ======= 유형 전환 =======
-        function selectType(type) {
-            selectedUserType = type;
-            document.getElementById('typeStudent').classList.toggle('active', type === 'student');
-            document.getElementById('typeTeacher').classList.toggle('active', type === 'teacher');
-            document.getElementById('studentFields').style.display = type === 'student' ? 'flex' : 'none';
-            document.getElementById('teacherFields').style.display = type === 'teacher' ? 'flex' : 'none';
-        }
-
-        function getSearchInfo() {
-            if (selectedUserType === 'student') {
-                const g = parseInt(document.getElementById('searchGrade').value);
-                const c = parseInt(document.getElementById('searchClass').value);
-                const n = parseInt(document.getElementById('searchNumber').value);
-                if (!g || !c || !n) return null;
-                return g + '학년 ' + c + '반 ' + n + '번';
-            }
-            return document.getElementById('searchDept').value || null;
+        // ======= 🔒 비밀번호 SHA-256 해시 =======
+        async function sha256(text) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         // ======= 조회 실행 =======
         async function searchMyRequests() {
             const name = document.getElementById('searchName').value.trim();
-            const info = getSearchInfo();
+            const pw   = document.getElementById('searchPassword').value.trim();
 
             if (!name) { showError('searchError', '✏️ 성명을 입력해주세요.'); return; }
-            if (!info) {
-                showError('searchError', selectedUserType === 'student'
-                    ? '학년, 반, 번호를 모두 입력해주세요.'
-                    : '소속 부서를 선택해주세요.');
-                return;
-            }
+            if (!pw)   { showError('searchError', '🔒 조회용 비밀번호를 입력해주세요.'); return; }
 
             const btn = document.getElementById('searchBtn');
             btn.disabled = true;
             btn.textContent = '⏳ 조회 중...';
 
             try {
+                const enteredHash = await sha256(pw);
+
                 const [reqSnap, archSnap] = await Promise.all([
                     fbDb.collection('bookRequests').where('studentName', '==', name).get(),
                     fbDb.collection('bookRequestsArchive').where('studentName', '==', name).get()
                 ]);
 
                 const results = [];
-                reqSnap.docs.forEach(doc => {
-                    if (doc.data().studentInfo === info) results.push(doc.data());
-                });
-                archSnap.docs.forEach(doc => {
-                    if (doc.data().studentInfo === info) results.push(doc.data());
-                });
+                let hiddenCount = 0; // 비밀번호가 일치하지 않아 가려진 건수
+
+                // 이름이 일치하는 신청 내역을 대상으로 비밀번호 검증
+                const isTempEntered = (pw === TEMP_PASSWORD);
+                const collect = doc => {
+                    const data = doc.data();
+                    if (!data.passwordHash) {
+                        // 비밀번호 등록 전 신청분 → 임시 비밀번호로만 조회 가능
+                        if (isTempEntered) results.push(data);
+                        else hiddenCount++;
+                    } else if (data.passwordHash === enteredHash) {
+                        results.push(data);
+                    } else {
+                        hiddenCount++;
+                    }
+                };
+                reqSnap.docs.forEach(collect);
+                archSnap.docs.forEach(collect);
 
                 results.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                displayResults(name, results);
+                displayResults(name, results, hiddenCount);
 
             } catch (e) {
                 console.error(e);
@@ -451,7 +439,8 @@
         }
 
         // ======= 결과 렌더링 =======
-        function displayResults(name, results) {
+        function displayResults(name, results, hiddenCount) {
+            hiddenCount = hiddenCount || 0;
             const section   = document.getElementById('resultsSection');
             const title     = document.getElementById('resultsTitle');
             const container = document.getElementById('resultsContainer');
@@ -460,16 +449,30 @@
             title.textContent = '📋 ' + name + '님의 신청 내역 (총 ' + results.length + '건)';
 
             if (results.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📭</div>
-                        <div class="empty-title">신청 내역이 없습니다</div>
-                        <div class="empty-desc">이름과 학년·반·번호를 정확히 입력했는지 확인해 주세요.<br>신청 내역은 도서 신청 후 바로 조회할 수 있습니다.</div>
-                    </div>`;
+                if (hiddenCount > 0) {
+                    // 이름·소속은 맞지만 비밀번호가 일치하지 않는 경우
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🔒</div>
+                            <div class="empty-title">비밀번호가 일치하지 않습니다</div>
+                            <div class="empty-desc">신청할 때 설정한 비밀번호를 정확히 입력했는지 확인해 주세요.<br>비밀번호를 입력하지 않으면 보호된 신청 내역은 표시되지 않습니다.</div>
+                        </div>`;
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-title">신청 내역이 없습니다</div>
+                            <div class="empty-desc">이름과 비밀번호를 정확히 입력했는지 확인해 주세요.<br>신청 내역은 도서 신청 후 바로 조회할 수 있습니다.</div>
+                        </div>`;
+                }
                 return;
             }
 
-            container.innerHTML = results.map(function(r) {
+            const lockNotice = hiddenCount > 0
+                ? '<div class="lock-notice">🔒 비밀번호가 일치하지 않아 표시되지 않은 신청 내역이 ' + hiddenCount + '건 있습니다. 비밀번호를 확인해 주세요.</div>'
+                : '';
+
+            container.innerHTML = lockNotice + results.map(function(r) {
                 var date     = r.createdAt ? new Date(r.createdAt).toLocaleDateString('ko-KR') : '-';
                 var isPurch  = (r.status === '구매 완료');
                 var badgeCls = 's-waiting';

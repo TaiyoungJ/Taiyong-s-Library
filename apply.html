@@ -106,8 +106,63 @@
             flex-direction: column;
             border-left: 4px solid #e2e8f0;
         }
+        .section-auth   { border-left-color: #9b59b6; }
         .section-search { border-left-color: #3498db; }
         .section-form   { border-left-color: #27ae60; }
+
+        /* === 신청자 확인(1단계) UI === */
+        .auth-notice {
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+        .auth-notice-new   { background: #eafaf1; color: #1e8449; border-left: 4px solid #27ae60; }
+        .auth-notice-exist { background: #ebf8ff; color: #2b6cb0; border-left: 4px solid #3498db; }
+        .auth-done {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: #eafaf1;
+            border: 1px solid #a9dfbf;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e8449;
+        }
+        .auth-btn {
+            width: 100%;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .auth-btn:hover { background-color: #8e44ad; }
+        .auth-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .auth-link-btn {
+            background: none;
+            border: 1px solid #cbd5e0;
+            color: #4a5568;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+        .auth-link-btn:hover { background: #edf2f7; }
 
         /* === 스텝 제목 === */
         .section-title {
@@ -133,8 +188,9 @@
             color: white;
             flex-shrink: 0;
         }
-        .step-1 { background: linear-gradient(135deg, #3498db, #2980b9); }
-        .step-2 { background: linear-gradient(135deg, #27ae60, #219a52); }
+        .step-1 { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .step-2 { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .step-3 { background: linear-gradient(135deg, #27ae60, #219a52); }
 
         /* === 도서 검색 UI === */
         .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
@@ -289,6 +345,7 @@
         .form-control:focus { outline: none; border-color: #3498db; background-color: white; }
         .form-control:disabled { background-color: #e2e8f0; color: #a0aec0; cursor: not-allowed; }
         textarea.form-control { resize: vertical; min-height: 100px; }
+        .field-hint { font-size: 12px; color: #7f8c8d; margin-top: 2px; line-height: 1.5; }
 
         /* === 신청자 유형 토글 === */
         .type-toggle { display: flex; gap: 8px; }
@@ -395,6 +452,20 @@
         body.dark-mode .preview-title { color: #ffffff; }
         body.dark-mode .preview-meta  { color: #a0aec0; }
         body.dark-mode .form-group label { color: #aaaaaa; }
+        body.dark-mode .field-hint { color: #8a9bb0; }
+        body.dark-mode .auth-notice-new   { background: rgba(39,174,96,0.15); color: #68d391; }
+        body.dark-mode .auth-notice-exist { background: rgba(52,152,219,0.15); color: #7fc4f0; }
+        body.dark-mode .auth-done {
+            background: rgba(39,174,96,0.12);
+            border-color: rgba(39,174,96,0.3);
+            color: #68d391;
+        }
+        body.dark-mode .auth-link-btn {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.18);
+            color: #cccccc;
+        }
+        body.dark-mode .auth-link-btn:hover { background: rgba(255,255,255,0.12); }
         body.dark-mode .search-input, body.dark-mode .form-control {
             background: rgba(0,0,0,0.3);
             border-color: rgba(255,255,255,0.15);
@@ -572,10 +643,109 @@
             <span style="font-size: 13px; font-weight: normal;">(1인당 최대 5권 신청 가능)</span>
         </div>
 
-        <!-- 1단계: 도서 검색 -->
-        <div class="section section-search">
+        <!-- 1단계: 신청자 확인 -->
+        <div class="section section-auth" id="authSection">
             <div class="section-title">
                 <span class="step-num step-1">1</span>
+                신청자 확인
+            </div>
+
+            <!-- 1-A. 신원 입력 -->
+            <div id="identityBlock">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="studentName">신청자 성명</label>
+                        <input type="text" id="studentName" class="form-control" placeholder="이름을 입력하세요">
+                    </div>
+                    <div class="form-group">
+                        <label>신청자 유형</label>
+                        <div class="type-toggle">
+                            <button type="button" class="type-btn active" id="typeStudent" onclick="selectType('student')">🎒 학생</button>
+                            <button type="button" class="type-btn" id="typeTeacher" onclick="selectType('teacher')">👨‍🏫 교직원</button>
+                        </div>
+                    </div>
+                    <div class="form-group full-width" id="studentFields">
+                        <label>소속 학년 / 반 / 번호</label>
+                        <div class="student-info-row">
+                            <div class="num-input-group">
+                                <input type="number" id="studentGrade" class="form-control" min="1" max="3" placeholder="학년">
+                                <span class="num-label">학년</span>
+                            </div>
+                            <div class="num-input-group">
+                                <input type="number" id="studentClass" class="form-control" min="1" max="9" placeholder="반">
+                                <span class="num-label">반</span>
+                            </div>
+                            <div class="num-input-group">
+                                <input type="number" id="studentNumber" class="form-control" min="1" max="40" placeholder="번호">
+                                <span class="num-label">번</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group full-width" id="teacherFields" style="display:none;">
+                        <label for="teacherDept">소속 부서</label>
+                        <select id="teacherDept" class="form-control">
+                            <option value="">부서를 선택하세요</option>
+                            <option>교무부</option>
+                            <option>교육과정부</option>
+                            <option>1학년부</option>
+                            <option>2학년부</option>
+                            <option>3학년부</option>
+                            <option>과학정보부</option>
+                            <option>학생생활지원부</option>
+                            <option>건강체육부</option>
+                            <option>인문사회부</option>
+                            <option>진로진학지원부</option>
+                            <option>행정실</option>
+                            <option>연구부</option>
+                            <option>행정실장</option>
+                            <option>교감</option>
+                            <option>교장</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="authError" class="inline-error" style="display:none;"></div>
+                <button class="auth-btn" id="identifyBtn" onclick="identifyUser()">다음 단계로 →</button>
+            </div>
+
+            <!-- 1-B. 비밀번호 등록(신규) / 입력(기존) -->
+            <div id="passwordBlock" style="display:none;">
+                <div id="authNoticeNew" class="auth-notice auth-notice-new" style="display:none;">
+                    🎉 처음 신청하시는군요! 앞으로 <strong>신청·조회에 사용할 비밀번호</strong>를 등록해주세요.
+                </div>
+                <div id="authNoticeExist" class="auth-notice auth-notice-exist" style="display:none;">
+                    👋 이미 등록된 신청자입니다. 기존에 설정한 <strong>비밀번호를 입력</strong>해주세요.<br>
+                    <span style="font-weight:400; font-size:13px;">비밀번호를 잊으셨다면 도서관 담당 선생님께 초기화를 요청해주세요. (초기화 시 임시 비밀번호 <strong>12345</strong>)</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="authPassword">🔒 비밀번호</label>
+                        <input type="password" id="authPassword" class="form-control" placeholder="비밀번호 (4자 이상)" autocomplete="off" maxlength="30" onkeydown="if(event.key==='Enter') submitAuth()">
+                    </div>
+                    <div class="form-group full-width" id="authConfirmWrap" style="display:none;">
+                        <label for="authPasswordConfirm">🔒 비밀번호 확인</label>
+                        <input type="password" id="authPasswordConfirm" class="form-control" placeholder="비밀번호를 한 번 더 입력하세요" autocomplete="off" maxlength="30" onkeydown="if(event.key==='Enter') submitAuth()">
+                        <small class="field-hint">오타 방지를 위해 한 번 더 입력해주세요. 등록한 비밀번호는 신청 내역 조회에도 사용됩니다.</small>
+                    </div>
+                </div>
+                <div id="authPwError" class="inline-error" style="display:none;"></div>
+                <div style="display:flex; gap:8px; align-items:stretch;">
+                    <button class="auth-link-btn" onclick="backToIdentity()">← 정보 수정</button>
+                    <button class="auth-btn" id="authSubmitBtn" style="flex:1;" onclick="submitAuth()">확인</button>
+                </div>
+            </div>
+
+            <!-- 1-C. 확인 완료 -->
+            <div id="authDoneBlock" class="auth-done" style="display:none;">
+                <span id="authDoneText">✅ 확인되었습니다.</span>
+                <button class="auth-link-btn" onclick="logoutAuth()">다른 사람으로 신청</button>
+            </div>
+        </div>
+
+        <!-- 2단계: 도서 검색 -->
+        <div class="section section-search" id="searchSection" style="display:none;">
+            <div class="section-title">
+                <span class="step-num step-2">2</span>
                 신규 도서 검색
             </div>
             <div class="search-row">
@@ -588,10 +758,10 @@
             </div>
         </div>
 
-        <!-- 2단계: 신청자 정보 -->
-        <div class="section section-form">
+        <!-- 3단계: 신청서 작성 -->
+        <div class="section section-form" id="formSection" style="display:none;">
             <div class="section-title">
-                <span class="step-num step-2">2</span>
+                <span class="step-num step-3">3</span>
                 신청서 작성
             </div>
 
@@ -610,55 +780,6 @@
             <div id="validationBadge" class="validation-msg"></div>
 
             <div class="form-grid">
-                <div class="form-group">
-                    <label for="studentName">신청자 성명</label>
-                    <input type="text" id="studentName" class="form-control" placeholder="이름을 입력하세요">
-                </div>
-                <div class="form-group">
-                    <label>신청자 유형</label>
-                    <div class="type-toggle">
-                        <button type="button" class="type-btn active" id="typeStudent" onclick="selectType('student')">🎒 학생</button>
-                        <button type="button" class="type-btn" id="typeTeacher" onclick="selectType('teacher')">👨‍🏫 교직원</button>
-                    </div>
-                </div>
-                <div class="form-group full-width" id="studentFields">
-                    <label>소속 학년 / 반 / 번호</label>
-                    <div class="student-info-row">
-                        <div class="num-input-group">
-                            <input type="number" id="studentGrade" class="form-control" min="1" max="3" placeholder="학년">
-                            <span class="num-label">학년</span>
-                        </div>
-                        <div class="num-input-group">
-                            <input type="number" id="studentClass" class="form-control" min="1" max="9" placeholder="반">
-                            <span class="num-label">반</span>
-                        </div>
-                        <div class="num-input-group">
-                            <input type="number" id="studentNumber" class="form-control" min="1" max="40" placeholder="번호">
-                            <span class="num-label">번</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group full-width" id="teacherFields" style="display:none;">
-                    <label for="teacherDept">소속 부서</label>
-                    <select id="teacherDept" class="form-control">
-                        <option value="">부서를 선택하세요</option>
-                        <option>교무부</option>
-                        <option>교육과정부</option>
-                        <option>1학년부</option>
-                        <option>2학년부</option>
-                        <option>3학년부</option>
-                        <option>과학정보부</option>
-                        <option>학생생활지원부</option>
-                        <option>건강체육부</option>
-                        <option>인문사회부</option>
-                        <option>진로진학지원부</option>
-                        <option>행정실</option>
-                        <option>연구부</option>
-                        <option>행정실장</option>
-                        <option>교감</option>
-                        <option>교장</option>
-                    </select>
-                </div>
                 <div class="form-group full-width">
                     <div class="extra-checkbox" id="studentCheckboxWrap">
                         <input type="checkbox" id="consultingCheck">
@@ -732,6 +853,12 @@
 
         let selectedBook = null;
         let selectedUserType = 'student';
+
+        // 신청자 확인(1단계) 상태
+        let authedUser      = null;  // 확인 완료된 신청자 { name, info, type, passwordHash }
+        let pendingIdentity = null;  // 비밀번호 입력 대기 중인 신원 정보
+        let isNewUser       = false; // 신규 등록 여부
+        let existingHash    = null;  // 기존 이용자의 저장된 비밀번호 해시
         let currentActiveTerm = "2026년 3차 도서신청";
         let allInventoryCache = null;
 
@@ -1079,21 +1206,184 @@
             return null;
         }
 
+        // ======= 🔒 비밀번호 SHA-256 해시 =======
+        async function sha256(text) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // ============================================================
+        // 👤 1단계 · 신청자 확인 (신규 등록 / 기존 인증)
+        // ============================================================
+
+        // 이용자 문서 ID: "이름|소속" (사람당 1개 문서)
+        function makeUserDocId(name, info) { return name + '|' + info; }
+
+        // 신원 입력 → 신규/기존 판별
+        async function identifyUser() {
+            const name = document.getElementById('studentName').value.trim();
+            if (!name) { showError('authError', '✏️ 신청자 성명을 입력해 주세요.'); return; }
+
+            const validErr = validateStudentInfo();
+            if (validErr) { showError('authError', validErr); return; }
+
+            const info = getStudentInfo();
+            const btn  = document.getElementById('identifyBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ 확인 중...';
+
+            try {
+                const userDoc = await fbDb.collection('bookUsers').doc(makeUserDocId(name, info)).get();
+
+                pendingIdentity = { name: name, info: info, type: selectedUserType };
+                isNewUser = !userDoc.exists;
+                existingHash = userDoc.exists ? userDoc.data().passwordHash : null;
+
+                // 비밀번호 입력 화면으로 전환
+                document.getElementById('identityBlock').style.display = 'none';
+                document.getElementById('passwordBlock').style.display = 'block';
+                document.getElementById('authNoticeNew').style.display   = isNewUser ? 'block' : 'none';
+                document.getElementById('authNoticeExist').style.display = isNewUser ? 'none'  : 'block';
+                document.getElementById('authConfirmWrap').style.display = isNewUser ? 'flex'  : 'none';
+                document.getElementById('authSubmitBtn').textContent     = isNewUser ? '🔒 비밀번호 등록하고 시작하기' : '✅ 확인';
+                document.getElementById('authPassword').value = '';
+                document.getElementById('authPasswordConfirm').value = '';
+                document.getElementById('authPassword').focus();
+
+            } catch (e) {
+                console.error('신청자 확인 오류:', e);
+                showError('authError', '확인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '다음 단계로 →';
+            }
+        }
+
+        // 신원 입력 화면으로 되돌아가기
+        function backToIdentity() {
+            document.getElementById('passwordBlock').style.display = 'none';
+            document.getElementById('identityBlock').style.display = 'block';
+            pendingIdentity = null;
+        }
+
+        // 비밀번호 등록(신규) 또는 대조(기존)
+        async function submitAuth() {
+            if (!pendingIdentity) { backToIdentity(); return; }
+
+            const pw  = document.getElementById('authPassword').value.trim();
+            const btn = document.getElementById('authSubmitBtn');
+
+            if (!pw || pw.length < 4) { showError('authPwError', '🔒 비밀번호를 4자 이상 입력해 주세요.'); return; }
+
+            if (isNewUser) {
+                const pw2 = document.getElementById('authPasswordConfirm').value.trim();
+                if (pw !== pw2) { showError('authPwError', '🔒 비밀번호가 서로 일치하지 않습니다. 다시 확인해 주세요.'); return; }
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ 처리 중...';
+
+            try {
+                const hash = await sha256(pw);
+
+                if (isNewUser) {
+                    // 신규 등록
+                    await fbDb.collection('bookUsers').doc(makeUserDocId(pendingIdentity.name, pendingIdentity.info)).set({
+                        name: pendingIdentity.name,
+                        info: pendingIdentity.info,
+                        type: pendingIdentity.type,
+                        passwordHash: hash,
+                        createdAt: Date.now()
+                    });
+                } else {
+                    // 기존 이용자 → 비밀번호 대조
+                    if (hash !== existingHash) {
+                        showError('authPwError', '🔒 비밀번호가 일치하지 않습니다. 다시 입력해 주세요.');
+                        btn.disabled = false;
+                        btn.textContent = '✅ 확인';
+                        return;
+                    }
+                }
+
+                authedUser = {
+                    name: pendingIdentity.name,
+                    info: pendingIdentity.info,
+                    type: pendingIdentity.type,
+                    passwordHash: hash
+                };
+                completeAuth();
+
+            } catch (e) {
+                console.error('비밀번호 처리 오류:', e);
+                showError('authPwError', '처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+            } finally {
+                btn.disabled = false;
+                if (btn.textContent === '⏳ 처리 중...') {
+                    btn.textContent = isNewUser ? '🔒 비밀번호 등록하고 시작하기' : '✅ 확인';
+                }
+            }
+        }
+
+        // 인증 완료 → 2·3단계 열기
+        function completeAuth() {
+            document.getElementById('identityBlock').style.display = 'none';
+            document.getElementById('passwordBlock').style.display = 'none';
+            document.getElementById('authDoneBlock').style.display = 'flex';
+            document.getElementById('authDoneText').textContent =
+                '✅ ' + authedUser.name + ' (' + authedUser.info + ') 님으로 확인되었습니다.';
+
+            document.getElementById('searchSection').style.display = 'flex';
+            document.getElementById('formSection').style.display   = 'flex';
+        }
+
+        // 다른 사람으로 신청 (초기화)
+        function logoutAuth() {
+            authedUser = null;
+            pendingIdentity = null;
+            isNewUser = false;
+            existingHash = null;
+            selectedBook = null;
+
+            document.getElementById('authDoneBlock').style.display = 'none';
+            document.getElementById('passwordBlock').style.display = 'none';
+            document.getElementById('identityBlock').style.display = 'block';
+            document.getElementById('searchSection').style.display = 'none';
+            document.getElementById('formSection').style.display   = 'none';
+
+            document.getElementById('studentName').value  = '';
+            document.getElementById('studentGrade').value = '';
+            document.getElementById('studentClass').value = '';
+            document.getElementById('studentNumber').value = '';
+            document.getElementById('teacherDept').value  = '';
+            document.getElementById('authPassword').value = '';
+            document.getElementById('authPasswordConfirm').value = '';
+            selectType('student');
+            resetBookSelection();
+        }
+
+        // 도서 선택/검색 상태 초기화
+        function resetBookSelection() {
+            document.getElementById('requestReason').value = '';
+            document.getElementById('bookSearchInput').value = '';
+            document.getElementById('searchResultsContainer').innerHTML =
+                '<div style="text-align: center; color: #7f8c8d; padding: 20px;">검색 결과가 여기에 표시됩니다. 📚</div>';
+            document.getElementById('validationBadge').style.display  = 'none';
+            document.getElementById('selectedBookPreview').style.display = 'none';
+            document.getElementById('submitHint').style.display = 'block';
+            selectedBook = null;
+        }
+
         // ======= 🚀 최종 도서 신청서 제출 =======
         async function submitBookRequest() {
             if (!selectedBook) { showError('formError', '📚 도서를 먼저 검색하고 선택해 주세요.'); return; }
 
-            const sName  = document.getElementById('studentName').value.trim();
+            if (!authedUser) { showError('formError', '👤 1단계에서 신청자 확인을 먼저 진행해 주세요.'); return; }
+
             const reason = document.getElementById('requestReason').value.trim();
-
-            if (!sName) { showError('formError', '✏️ 신청자 성명을 입력해 주세요.'); return; }
-
-            const validErr = validateStudentInfo();
-            if (validErr) { showError('formError', validErr); return; }
-
             if (!reason) { showError('formError', '📝 신청 사유를 입력해 주세요.'); return; }
 
-            const sInfo = getStudentInfo();
+            const sName = authedUser.name;
+            const sInfo = authedUser.info;
             const extraRequest = selectedUserType === 'student'
                 ? document.getElementById('consultingCheck').checked
                 : document.getElementById('classUseCheck').checked;
@@ -1124,31 +1414,20 @@
                     thumbnail: selectedBook.thumbnail,
                     studentName: sName,
                     studentInfo: sInfo,
-                    studentType: selectedUserType,
+                    studentType: authedUser.type,
                     extraRequest: extraRequest,
                     reason: reason,
                     term: currentActiveTerm,
                     status: "심사대기",
                     rejectReason: "",
+                    passwordHash: authedUser.passwordHash,
                     createdAt: Date.now()
                 });
 
                 showSuccess('formSuccess', `🎉 도서 신청이 정상적으로 접수되었습니다!`);
 
-                // 폼 리셋
-                document.getElementById('requestReason').value = "";
-                document.getElementById('bookSearchInput').value = "";
-                document.getElementById('searchResultsContainer').innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">검색 결과가 여기에 표시됩니다. 📚</div>';
-                document.getElementById('validationBadge').style.display = 'none';
-                document.getElementById('selectedBookPreview').style.display = 'none';
-                document.getElementById('submitHint').style.display = 'block';
-                document.getElementById('studentName').value = '';
-                document.getElementById('studentGrade').value = '';
-                document.getElementById('studentClass').value = '';
-                document.getElementById('studentNumber').value = '';
-                document.getElementById('teacherDept').value = '';
-                selectType('student');
-                selectedBook = null;
+                // 도서·사유만 초기화 (신청자 확인 상태는 유지 → 이어서 신청 가능)
+                resetBookSelection();
 
             } catch (e) {
                 console.error("신청서 제출 오류:", e);
