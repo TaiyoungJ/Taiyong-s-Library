@@ -694,12 +694,14 @@
                             <option>학생생활지원부</option>
                             <option>건강체육부</option>
                             <option>인문사회부</option>
+                            <option>창의체험부</option>
                             <option>진로진학지원부</option>
                             <option>행정실</option>
                             <option>연구부</option>
                             <option>행정실장</option>
                             <option>교감</option>
                             <option>교장</option>
+                            <option>수서 작업 관리자</option>
                         </select>
                     </div>
                 </div>
@@ -1399,7 +1401,8 @@
                     .where('studentInfo', '==', sInfo)
                     .get();
 
-                if (requestQuery.size >= 5) {
+                const isUnlimited = selectedUserType === 'teacher' && sInfo === '수서 작업 관리자';
+                if (!isUnlimited && requestQuery.size >= 5) {
                     showError('formError', `${sName}님은 이번 차수(${currentActiveTerm})에 이미 5권을 신청하셨습니다. 더 이상 신청하실 수 없습니다.`);
                     submitBtn.disabled = false;
                     submitBtn.textContent = "📚 도서 신청서 제출하기";
