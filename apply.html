@@ -653,11 +653,11 @@
             <!-- 1-A. 신원 입력 -->
             <div id="identityBlock">
                 <div class="form-grid">
-                    <div class="form-group">
+                    <div class="form-group" id="nameFieldWrap">
                         <label for="studentName">신청자 성명</label>
                         <input type="text" id="studentName" class="form-control" placeholder="이름을 입력하세요">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="typeFieldWrap">
                         <label>신청자 유형</label>
                         <div class="type-toggle">
                             <button type="button" class="type-btn active" id="typeStudent" onclick="selectType('student')">🎒 학생</button>
@@ -683,7 +683,7 @@
                     </div>
                     <div class="form-group full-width" id="teacherFields" style="display:none;">
                         <label for="teacherDept">소속 부서</label>
-                        <select id="teacherDept" class="form-control">
+                        <select id="teacherDept" class="form-control" onchange="onDeptChange()">
                             <option value="">부서를 선택하세요</option>
                             <option>교무부</option>
                             <option>교육과정부</option>
@@ -713,6 +713,9 @@
             <div id="passwordBlock" style="display:none;">
                 <div id="authNoticeNew" class="auth-notice auth-notice-new" style="display:none;">
                     🎉 처음 신청하시는군요! 앞으로 <strong>신청·조회에 사용할 비밀번호</strong>를 등록해주세요.
+                </div>
+                <div id="authNoticeAdmin" class="auth-notice auth-notice-exist" style="display:none;">
+                    🔑 <strong>수서 작업 관리자</strong> 비밀번호를 입력해주세요.
                 </div>
                 <div id="authNoticeExist" class="auth-notice auth-notice-exist" style="display:none;">
                     👋 이미 등록된 신청자입니다. 기존에 설정한 <strong>비밀번호를 입력</strong>해주세요.<br>
@@ -861,6 +864,11 @@
         let pendingIdentity = null;  // 비밀번호 입력 대기 중인 신원 정보
         let isNewUser       = false; // 신규 등록 여부
         let existingHash    = null;  // 기존 이용자의 저장된 비밀번호 해시
+        let isAdminMode     = false; // 수서 작업 관리자 모드 (성명 없이 고정 비밀번호로 인증)
+
+        // 수서 작업 관리자: 성명 입력 없이 고정 비밀번호로 인증, 5권 제한 없음
+        const ADMIN_DEPT = '수서 작업 관리자';
+        const ADMIN_PW_HASH = 'ef1956ff4324600bc95aebe5d2b159dd0a621cac165b46016c6f71ec7811b312'; // SHA-256
         let currentActiveTerm = "2026년 3차 도서신청";
         let allInventoryCache = null;
 
@@ -1181,6 +1189,15 @@
             document.getElementById('teacherCheckboxWrap').style.display = type === 'teacher' ? 'flex' : 'none';
             document.getElementById('consultingCheck').checked = false;
             document.getElementById('classUseCheck').checked  = false;
+            onDeptChange();
+        }
+
+        // 소속 부서 변경 → 수서 작업 관리자면 성명·유형 입력란 숨김
+        function onDeptChange() {
+            isAdminMode = selectedUserType === 'teacher' &&
+                          document.getElementById('teacherDept').value === ADMIN_DEPT;
+            document.getElementById('nameFieldWrap').style.display = isAdminMode ? 'none' : 'flex';
+            document.getElementById('typeFieldWrap').style.display = isAdminMode ? 'none' : 'flex';
         }
 
         function getStudentInfo() {
@@ -1223,6 +1240,15 @@
 
         // 신원 입력 → 신규/기존 판별
         async function identifyUser() {
+            if (isAdminMode) {
+                // 수서 작업 관리자: bookUsers 조회 없이 바로 비밀번호 입력으로
+                pendingIdentity = { name: ADMIN_DEPT, info: ADMIN_DEPT, type: 'teacher' };
+                isNewUser = false;
+                existingHash = ADMIN_PW_HASH;
+                showPasswordBlock();
+                return;
+            }
+
             const name = document.getElementById('studentName').value.trim();
             if (!name) { showError('authError', '✏️ 신청자 성명을 입력해 주세요.'); return; }
 
@@ -1241,16 +1267,7 @@
                 isNewUser = !userDoc.exists;
                 existingHash = userDoc.exists ? userDoc.data().passwordHash : null;
 
-                // 비밀번호 입력 화면으로 전환
-                document.getElementById('identityBlock').style.display = 'none';
-                document.getElementById('passwordBlock').style.display = 'block';
-                document.getElementById('authNoticeNew').style.display   = isNewUser ? 'block' : 'none';
-                document.getElementById('authNoticeExist').style.display = isNewUser ? 'none'  : 'block';
-                document.getElementById('authConfirmWrap').style.display = isNewUser ? 'flex'  : 'none';
-                document.getElementById('authSubmitBtn').textContent     = isNewUser ? '🔒 비밀번호 등록하고 시작하기' : '✅ 확인';
-                document.getElementById('authPassword').value = '';
-                document.getElementById('authPasswordConfirm').value = '';
-                document.getElementById('authPassword').focus();
+                showPasswordBlock();
 
             } catch (e) {
                 console.error('신청자 확인 오류:', e);
@@ -1259,6 +1276,20 @@
                 btn.disabled = false;
                 btn.textContent = '다음 단계로 →';
             }
+        }
+
+        // 비밀번호 입력 화면으로 전환
+        function showPasswordBlock() {
+            document.getElementById('identityBlock').style.display = 'none';
+            document.getElementById('passwordBlock').style.display = 'block';
+            document.getElementById('authNoticeNew').style.display   = (!isAdminMode && isNewUser)  ? 'block' : 'none';
+            document.getElementById('authNoticeExist').style.display = (!isAdminMode && !isNewUser) ? 'block' : 'none';
+            document.getElementById('authNoticeAdmin').style.display = isAdminMode ? 'block' : 'none';
+            document.getElementById('authConfirmWrap').style.display = isNewUser ? 'flex'  : 'none';
+            document.getElementById('authSubmitBtn').textContent     = isNewUser ? '🔒 비밀번호 등록하고 시작하기' : '✅ 확인';
+            document.getElementById('authPassword').value = '';
+            document.getElementById('authPasswordConfirm').value = '';
+            document.getElementById('authPassword').focus();
         }
 
         // 신원 입력 화면으로 되돌아가기
@@ -1288,7 +1319,7 @@
             try {
                 const hash = await sha256(pw);
 
-                if (isNewUser) {
+                if (isNewUser && !isAdminMode) {
                     // 신규 등록
                     await fbDb.collection('bookUsers').doc(makeUserDocId(pendingIdentity.name, pendingIdentity.info)).set({
                         name: pendingIdentity.name,
@@ -1331,8 +1362,9 @@
             document.getElementById('identityBlock').style.display = 'none';
             document.getElementById('passwordBlock').style.display = 'none';
             document.getElementById('authDoneBlock').style.display = 'flex';
-            document.getElementById('authDoneText').textContent =
-                '✅ ' + authedUser.name + ' (' + authedUser.info + ') 님으로 확인되었습니다.';
+            document.getElementById('authDoneText').textContent = isAdminMode
+                ? '✅ ' + ADMIN_DEPT + '로 확인되었습니다. (신청 권수 제한 없음)'
+                : '✅ ' + authedUser.name + ' (' + authedUser.info + ') 님으로 확인되었습니다.';
 
             document.getElementById('searchSection').style.display = 'flex';
             document.getElementById('formSection').style.display   = 'flex';
@@ -1344,6 +1376,7 @@
             pendingIdentity = null;
             isNewUser = false;
             existingHash = null;
+            isAdminMode = false;
             selectedBook = null;
 
             document.getElementById('authDoneBlock').style.display = 'none';
@@ -1401,7 +1434,7 @@
                     .where('studentInfo', '==', sInfo)
                     .get();
 
-                const isUnlimited = selectedUserType === 'teacher' && sInfo === '수서 작업 관리자';
+                const isUnlimited = authedUser.type === 'teacher' && sInfo === ADMIN_DEPT;
                 if (!isUnlimited && requestQuery.size >= 5) {
                     showError('formError', `${sName}님은 이번 차수(${currentActiveTerm})에 이미 5권을 신청하셨습니다. 더 이상 신청하실 수 없습니다.`);
                     submitBtn.disabled = false;
